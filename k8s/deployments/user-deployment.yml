@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      labels:
+        app: user
+    spec:
+      initContainers:
+        - name: wait-for-rootdb
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z rootdb 5432; do echo "Waiting for rootdb..."; sleep 2; done']
+
+        - name: wait-for-rabbitmq
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo "Waiting for rabbitmq..."; sleep 2; done']
+      
+      containers:
+        - name: user
+          image: joelthomas1103/user:latest 
+          ports:
+            - containerPort: 8000  
+          env:
+            - name: DB_HOST
+              value: "rootdb"  
+            - name: DB_NAME
+              value: "root"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              value: "root"
+          volumeMounts:
+            - name: user-storage
+              mountPath: /app/user_data/  
+      
+      volumes:
+        - name: user-storage
+          persistentVolumeClaim:
+            claimName: shared-migrations-pvc 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  selector:
+    app: user  
+  ports:
+    - protocol: TCP
+      port: 8000          
+      targetPort: 8000    
+  type: ClusterIP       
