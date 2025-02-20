@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rootdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rootdb
+  template:
+    metadata:
+      labels:
+        app: rootdb
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          env:
+            - name: POSTGRES_USER
+              value: "root"
+            - name: POSTGRES_PASSWORD
+              value: "root"
+            - name: POSTGRES_DB
+              value: "root"
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d
+              name: init-script
+            - mountPath: /var/lib/postgresql/data
+              name: rootdb-storage
+      volumes:
+        - name: init-script
+          configMap:
+            name: postgres-initdb
+        - name: rootdb-storage
+          persistentVolumeClaim:
+            claimName: rootdb-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rootdb
+spec:
+  selector:
+    app: rootdb
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
