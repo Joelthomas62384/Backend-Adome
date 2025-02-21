@@ -50,10 +50,8 @@ manifests:
     - k8s/deployments/db-deployment.yml
     - k8s/deployments/media-deployment.yml
     - k8s/deployments/payment-deployment.yml
+    - k8s/deployments/rabbitmq-deployment.yml
     - k8s/deployments/tenant-deployment.yml
     - k8s/deployments/user-deployment.yml
     - k8s/ingress/ingress.yml
-    - k8s/pvc/db-pvc.yml
-    - k8s/pvc/rabbitmq-pvc.yml
-    - k8s/pvc/shared-pvc.yml
-    - k8s/secrets/secret.yml
+

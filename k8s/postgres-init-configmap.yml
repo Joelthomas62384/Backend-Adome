@@ -6,5 +6,5 @@ data:
   init.sql: |
     CREATE DATABASE user_service;
     CREATE DATABASE tenant_service;
-    CREATE DATABASE media-service;
-    CREATE DATABASE payment-service;
+    CREATE DATABASE media_service;
+    CREATE DATABASE payment_service;

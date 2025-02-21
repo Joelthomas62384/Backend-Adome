@@ -46,10 +46,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Tenants(models.Model):
     appname = models.CharField(max_length=100 , unique=True)
-    subdomain = models.CharField(max_length=100)
+    subdomain = models.CharField(max_length=100,unique=True)
 
     def __str__(self):
         return self.appname
+    
+    class Meta:
+        verbose_name = 'Tenant'
+        verbose_name_plural = 'Tenants'
     
 
 class TenantUsers(models.Model):
@@ -60,3 +64,11 @@ class TenantUsers(models.Model):
     blocked = models.BooleanField(default=False)
     banned = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} in {self.tenant.appname}"
+    
+    class Meta:
+        unique_together = ('tenant', 'user')
+        verbose_name = 'Tenant User'
+        verbose_name_plural = 'Tenant Users'
