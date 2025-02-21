@@ -33,8 +33,13 @@ spec:
               value: "root"
             - name: DB_USER
               value: "root"
-            - name: DB_PASSWORD
-              value: "root"
+            - name: DB_PASSWORD  # Getting from secret
+              value : "root"
+            - name: SECRET_KEY  # Getting from secret
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: SECRET_KEY
           volumeMounts:
             - name: media-storage
               mountPath: /app/media_data/  
