@@ -2,9 +2,12 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.contrib.auth.models import AnonymousUser
-from . models import TenantUsers
+from . models import TenantUsers, UserCache
 
 class CustomJwtAuthentication(JWTAuthentication):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user_model = UserCache
     def authenticate(self, request):
         raw_token = request.COOKIES.get('access_token')
         refresh_token = request.COOKIES.get('refresh_token')
@@ -24,11 +27,8 @@ class CustomJwtAuthentication(JWTAuthentication):
         
         tenant = request.tenant
         
-        tenantuser = TenantUsers.objects.get(user=user, tenant=tenant)
-
-        if tenantuser is None:
-            raise AuthenticationFailed("Tenant user not found.")
-        request.tenantuser = tenantuser
+     
+        user.is_authenticated = True
         return user, validated_token 
     
 

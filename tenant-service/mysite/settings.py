@@ -52,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'app.middlewares.TenantMiddleware',
 ]
 
 
@@ -76,6 +77,16 @@ CORS_ALLOW_HEADERS = [
     "accept-encoding",
     "origin",
 ]
+
+REST_FRAMEWORK  = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+       'app.authenticate.CustomJwtAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+       'rest_framework.permissions.IsAuthenticated',
+    ),
+    
+}
 
 
 CSRF_TRUSTED_ORIGINS = [
