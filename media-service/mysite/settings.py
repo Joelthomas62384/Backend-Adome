@@ -51,6 +51,17 @@ MIDDLEWARE = [
 ]
 
 
+REST_FRAMEWORK  = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+       'app.authenticate.CustomJwtAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+       'rest_framework.permissions.IsAuthenticated',
+    ),
+    
+}
+
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 

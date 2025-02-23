@@ -1,7 +1,15 @@
+import os
+import django
+
+
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
+django.setup()
+
 import pika 
 import json
 import logging
-from . consume_utils import  user_callback
+from  consume_utils import  user_callback
 
 
 
@@ -22,10 +30,11 @@ def callback(ch, method, properties, body):
     contenttype = routing_key.split('.')[1]
     event_type = routing_key.split('.')[-1]
     data = json.loads(body)
+    print(f"tenant : {data}")
     
-    if contenttype == 'tenant':
+    if contenttype == 'user':
         user_callback(ch , event_type , data , method)
-        logging.info('tenant callback done')
+        logging.info('user callback done')
 
 
 
@@ -35,3 +44,4 @@ channel.basic_consume(queue='tenant-service', on_message_callback=callback, auto
 
 
 
+channel.start_consuming()

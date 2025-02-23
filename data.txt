@@ -1,0 +1,18 @@
+User service 
+    -User Model - contenttype = user
+        - [ id, name , email , full_name , username , profile_pic , is_staff , is_active , is_superuser , created_at , updated_at]
+    TenantUser Model: contenttype = tenantuser
+        - [
+              tenant , user , is_admin , is_staff , blocked , banned , created_at , 
+        ]
+
+Tenant Service : contenttype = tenant
+    - Tenants Model:
+        [  'id' ,'name', 'domain', 'contact_email', 'founding_year',
+            'location', 'description', 'blog', 'community', 'newsletter'  , 'admin' ,subscription_plan
+        ]
+
+
+Payment Service : 
+    - Tenants Model : contenttype = "subscription"
+

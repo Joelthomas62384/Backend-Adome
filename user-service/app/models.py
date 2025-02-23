@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser , PermissionsMixin , BaseUserManager
 
-
+from django.contrib.auth.models import AbstractUser, Group, Permission
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
@@ -35,6 +35,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = CustomUserManager()
+    groups = models.ManyToManyField(Group, related_name="custom_user_groups", blank=True)
+    user_permissions = models.ManyToManyField(Permission, related_name="custom_user_permissions", blank=True)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'name']
@@ -45,7 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Tenants(models.Model):
-    appname = models.CharField(max_length=100 , unique=True)
+    name = models.CharField(max_length=100 , unique=True)
     subdomain = models.CharField(max_length=100,unique=True)
 
     def __str__(self):
