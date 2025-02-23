@@ -11,6 +11,7 @@ class UserCache(models.Model):
     full_name = models.CharField(max_length=100 , null=True)
     profile_pic = models.TextField(null=True)
     is_superuser = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.username

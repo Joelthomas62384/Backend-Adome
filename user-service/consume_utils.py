@@ -1,4 +1,4 @@
-from app.models import TenantUsers, Tenants
+from app.models import TenantUsers, Tenants, User
 import logging
 
 logger = logging.getLogger(__name__)
@@ -11,7 +11,9 @@ def tenant_callback(ch, event_type, data, method):
             return
 
         if event_type == 'created':
-            Tenants.objects.create(name=data['name'], subdomain=data['subdomain'], id=data['id'])
+            tenant = Tenants.objects.create(name=data['name'], subdomain=data['subdomain'], id=data['id'])
+            user = User.objects.get(id=data['admin'])
+            TenantUsers.objects.create(tenant=tenant, user=user, is_admin=True)
             logger.info(f"Created tenant with data: {data}")
 
         elif event_type == 'updated':

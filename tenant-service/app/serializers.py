@@ -10,8 +10,10 @@ class TenantSerializer(serializers.ModelSerializer):
         model = Tenants
         fields = [
 
-           'id' ,'name', 'domain', 'contact_email', 'founding_year',
-            'location', 'description', 'blog', 'community', 'newsletter'  , 'admin' , 'subscription_plan' , 'subdomain'
+           'id' ,'name', 'domain', 'contact_email', 
+            'location', 'description', 'blog', 'community', 'newsletter'  , 'admin' , 'subscription_plan' , 'subdomain' , 'contact_email'
         ]
         read_only_fields = ['id']
-        
+    def create(self, validated_data):
+        validated_data['admin'] = self.context['request'].user 
+        return super().create(validated_data)

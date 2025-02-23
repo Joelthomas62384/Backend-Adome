@@ -57,26 +57,6 @@ MIDDLEWARE = [
 
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000", 
-    "http://127.0.0.1:3000",
-    "https://ms-blogs.com",  
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://ms-blogs.com",
-    "http://localhost:3000"
-]
-
-CORS_ALLOW_HEADERS = [
-    "content-type",
-    "authorization",
-    "x-csrftoken",
-    "x-requested-with",
-    "accept",
-    "accept-encoding",
-    "origin",
-]
 
 REST_FRAMEWORK  = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -89,10 +69,27 @@ REST_FRAMEWORK  = {
 }
 
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000"
+import re
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http?:\/\/localhost(:\d+)?$",
+    r"^http?:\/\/([a-zA-Z0-9-]+)\.frontend\.localhost(:\d+)?$",
 ]
 
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000", 
+]
+
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+    "x-csrftoken",
+    "x-requested-with",
+    "accept",
+    "accept-encoding",
+    "origin",
+]
+CORS_ALLOW_CREDENTIALS = True
 ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATES = [

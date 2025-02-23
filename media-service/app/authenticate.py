@@ -28,6 +28,7 @@ class CustomJwtAuthentication(JWTAuthentication):
         
      
         user.is_authenticated = True
+        # user.is_active = True
         return user, validated_token 
     
 

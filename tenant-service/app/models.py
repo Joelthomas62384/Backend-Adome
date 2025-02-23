@@ -8,6 +8,7 @@ from django.db import models
 
 class UserCache(models.Model):
     username = models.CharField(max_length=150,unique=True )
+    is_active = models.BooleanField(default=True,)
     
     def __str__(self):
         return self.username
@@ -26,7 +27,6 @@ class Tenants(models.Model):
     logo = models.TextField(null=True,blank=True)
     domain = models.CharField(max_length=250,null=True)
     contact_email = models.EmailField(null=True,blank=True)
-    founding_year = models.CharField(max_length=100, blank=True, null=True)
     location = models.CharField(max_length=100 , blank=True, null=True)
     description = models.TextField(null=True, blank=True)
     blog =models.BooleanField(default=True)

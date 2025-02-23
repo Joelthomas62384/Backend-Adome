@@ -26,6 +26,13 @@ spec:
             port:
               number: 8000
 
+      - path: /mediamanager(/|$)(.*)  
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: media-service
+            port:
+              number: 8000
       - path: /media(/|$)(.*)  
         pathType: ImplementationSpecific
         backend:

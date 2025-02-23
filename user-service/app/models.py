@@ -52,7 +52,7 @@ class Tenants(models.Model):
     subdomain = models.CharField(max_length=100,unique=True)
 
     def __str__(self):
-        return self.name
+        return self.subdomain
     
     class Meta:
         verbose_name = 'Tenant'

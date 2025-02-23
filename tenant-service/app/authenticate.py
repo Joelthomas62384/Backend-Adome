@@ -2,7 +2,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.contrib.auth.models import AnonymousUser
-from . models import TenantUsers, UserCache
+from . models import  UserCache
 
 class CustomJwtAuthentication(JWTAuthentication):
     def __init__(self, *args, **kwargs):

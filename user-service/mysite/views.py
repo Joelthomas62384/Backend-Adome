@@ -73,7 +73,7 @@ class LoginView(APIView):
             "scope": scope,
             'state': state,
             'access_type':'offline',
-            "prompt":"select_account"
+            # "prompt":"select_account"
         }
         # print(redirect_uri)
         # print(google_client_id)
@@ -154,9 +154,14 @@ class LoginView(APIView):
         
             if state:
                 app = Tenants.objects.get(subdomain=state)
-                tenantuser , create = TenantUsers.objects.get_or_create(tenant=app, user=user)
+                tenantuser , create = TenantUsers.objects.get_or_create(tenant=app, user=user )
                 if create:
                     tenantuser.save()
+                else:
+                    if TenantUsers.objects.filter(user=user , is_admin=True).exists():
+                        app = TenantUsers.objects.get(user=user , is_admin=True).tenant
+                        print(app)
+                
             refresh = RefreshToken.for_user(user)
             refresh['is_superuser'] = user.is_superuser
             refresh['is_staff'] = tenantuser.is_staff
@@ -205,7 +210,7 @@ class RefreshTokenView(APIView):
         try:
             refresh = RefreshToken(token)
             user = User.objects.get(id=refresh['user_id'])
-            tenantuser = TenantUsers.objects.filter(user=user, tenant=request.tenant)  
+            tenantuser = TenantUsers.objects.get(user=user, tenant=request.tenant)  
             
             refresh['is_superuser'] = user.is_superuser
             refresh['is_staff'] = tenantuser.is_staff

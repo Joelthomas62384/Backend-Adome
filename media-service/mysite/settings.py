@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 import os
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY' )
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -48,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'app.middlewares.TenantMiddleware',
 ]
 
 
@@ -63,15 +64,15 @@ REST_FRAMEWORK  = {
 
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000", 
-    "http://127.0.0.1:3000",
-    "https://ms-blogs.com",  
+import re
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http?:\/\/localhost(:\d+)?$",
+    r"^http?:\/\/([a-zA-Z0-9-]+)\.frontend\.localhost(:\d+)?$",
 ]
 
+
 CSRF_TRUSTED_ORIGINS = [
-    "https://ms-blogs.com",
-    "http://localhost:3000"
+    "http://localhost:3000", 
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -83,11 +84,8 @@ CORS_ALLOW_HEADERS = [
     "accept-encoding",
     "origin",
 ]
+CORS_ALLOW_CREDENTIALS = True
 
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000"
-]
 
 ROOT_URLCONF = 'mysite.urls'
 
@@ -158,6 +156,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
