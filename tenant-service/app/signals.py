@@ -13,6 +13,8 @@ from .serializers import TenantSerializer
 @receiver(post_save, sender=Tenants)
 def send_tenant_data(sender, instance, created, **kwargs):
     serializer = TenantSerializer(instance)
+    print("updating or creating tenants and sending it.")
+    # pritn("updating")
     if created :
         Publisher(serializer.data , "tenant" , "created")
     else:

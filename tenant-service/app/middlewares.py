@@ -16,5 +16,5 @@ class TenantMiddleware(MiddlewareMixin):
             return JsonResponse({'error': 'Invalid tenant'}, status=404)
 
         request.tenant = tenant
-        request.path = "/" + "/".join(newpath)  
+        request.path_info = "/" + "/".join(newpath) 
 

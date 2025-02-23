@@ -8,3 +8,4 @@ django-cors-headers
 django-tenants
 python-dotenv
 requests
+python-dotenv

@@ -18,6 +18,7 @@ def Publisher(data, contenttype, event_type):
             channel.exchange_declare(exchange='appevents', exchange_type='topic', durable=True)
 
             routing_key = f"app.{contenttype}.{event_type}"
+            print(data)
             
             channel.basic_publish(
                 exchange="appevents",

@@ -57,16 +57,17 @@ MIDDLEWARE = [
 
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000", 
-    "http://127.0.0.1:3000",
-    "https://ms-blogs.com",  
+import re
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http?:\/\/localhost(:\d+)?$",
+    r"^http?:\/\/([a-zA-Z0-9-]+)\.frontend\.localhost(:\d+)?$",
 ]
 
+
 CSRF_TRUSTED_ORIGINS = [
-    "https://ms-blogs.com",
-    "http://localhost:3000"
+    "http://localhost:3000", 
 ]
+
 
 CORS_ALLOW_HEADERS = [
     "content-type",
@@ -78,10 +79,9 @@ CORS_ALLOW_HEADERS = [
     "origin",
 ]
 
+CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000"
-]
+
 
 ROOT_URLCONF = 'mysite.urls'
 

@@ -16,7 +16,7 @@ def Publisher(data, contenttype, event_type):
         with pika.BlockingConnection(connection_params) as connection:
             channel = connection.channel()
             channel.exchange_declare(exchange='appevents', exchange_type='topic', durable=True)
-
+            print(data)
             routing_key = f"app.{contenttype}.{event_type}"
             
             channel.basic_publish(

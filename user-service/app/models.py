@@ -44,6 +44,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
     
+    
 
 
 class Tenants(models.Model):
@@ -51,7 +52,7 @@ class Tenants(models.Model):
     subdomain = models.CharField(max_length=100,unique=True)
 
     def __str__(self):
-        return self.appname
+        return self.name
     
     class Meta:
         verbose_name = 'Tenant'
@@ -68,7 +69,7 @@ class TenantUsers(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} in {self.tenant.appname}"
+        return f"{self.user.username} in {self.tenant.name}"
     
     class Meta:
         unique_together = ('tenant', 'user')

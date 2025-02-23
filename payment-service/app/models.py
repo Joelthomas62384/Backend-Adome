@@ -42,7 +42,7 @@ class TenantUsers(models.Model):
 
 
     def __str__(self):
-        return self.user_id + ' in ' + self.tenant.name
+        return self.user.username + ' in ' + self.tenant.name
     
 
     

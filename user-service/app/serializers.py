@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from . models import User
+from . models import User , TenantUsers
 
 
 
@@ -27,7 +27,12 @@ class TenantUserSerializer(serializers.ModelSerializer):
     class Meta:
 
         
-        model = User
-        fields = ['tenant', 'user', 'is_admin', 'is_staff', 'blocked', 'banned', 'created_at']
+        model = TenantUsers
+        fields = ['tenant', 'user', 'is_admin', 'is_staff', 'blocked', 'banned', 'created_at' , 'id']
         read_only_fields = ['created_at']
 
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()

@@ -11,6 +11,7 @@ from .models import TenantUsers
 @receiver(post_save, sender=User)
 def send_user_data(sender, instance, created, **kwargs):
     serializer = UserSerializer(instance)
+    
     if created :
         Publisher(serializer.data , "user" , "created")
     else:
