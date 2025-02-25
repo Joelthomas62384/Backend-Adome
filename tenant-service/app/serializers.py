@@ -11,9 +11,11 @@ class TenantSerializer(serializers.ModelSerializer):
         fields = [
 
            'id' ,'name', 'domain', 'contact_email', 
-            'location', 'description', 'blog', 'community', 'newsletter'  , 'admin' , 'subscription_plan' , 'subdomain' , 'contact_email'
+            'location', 'description', 'blog', 'community', 'newsletter'  , 'admin' , 'subscription_plan' , 'subdomain' , 'contact_email' , 'logo'
         ]
         read_only_fields = ['id']
     def create(self, validated_data):
         validated_data['admin'] = self.context['request'].user 
         return super().create(validated_data)
+
+        # '/media/logos/brototype_logo_vuloeXg.png'

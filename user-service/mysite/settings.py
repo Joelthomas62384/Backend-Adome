@@ -42,6 +42,18 @@ INSTALLED_APPS = [
      'rest_framework',
      'app',
 ]
+# Allow secure cookies
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# Allow frontend domain to access backend cookies
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://brototype.localhost.com",  # Change this to match your frontend
+]
+
+# If using CORS_ALLOW_ALL_ORIGINS (not recommended)
+CORS_ALLOW_ALL_ORIGINS = False
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,20 +67,26 @@ MIDDLEWARE = [
     'app.middlewares.TenantMiddleware'
 ]
 
-
-
 import re
+
+# ✅ Allow localhost and any subdomain like agency.localhost:3000
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http?:\/\/localhost(:\d+)?$",
-    r"^http?:\/\/([a-zA-Z0-9-]+)\.frontend\.localhost(:\d+)?$",
+    r"^https?://localhost(:\d+)?$",  # Match HTTP & HTTPS localhost
+    r"^https?://([a-zA-Z0-9-]+)\.frontend\.localhost(:\d+)?$",  # Subdomains under frontend.localhost
+    r"^https?://([a-zA-Z0-9-]+)\.localhost(:\d+)?$",  # Any subdomain under localhost
 ]
 
-
+# ✅ Include all subdomains in CSRF_TRUSTED_ORIGINS
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000", 
+    "http://localhost:3000",
+    "https://localhost:3000",
+    "http://brototype.localhost:3000",
+    "https://brototype.localhost:3000",
+    "http://frontend.localhost:3000",
+    "https://frontend.localhost:3000",
 ]
 
-
+# ✅ Allow important headers
 CORS_ALLOW_HEADERS = [
     "content-type",
     "authorization",
@@ -79,8 +97,16 @@ CORS_ALLOW_HEADERS = [
     "origin",
 ]
 
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://localhost:3000",
+    "http://brototype.localhost:3000",
+    "https://brototype.localhost:3000",
+]
 
+
+# ✅ Allow credentials (for authentication)
+CORS_ALLOW_CREDENTIALS = True
 
 
 ROOT_URLCONF = 'mysite.urls'

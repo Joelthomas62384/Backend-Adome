@@ -56,23 +56,10 @@ MIDDLEWARE = [
 ]
 
 
-
-
-REST_FRAMEWORK  = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-       'app.authenticate.CustomJwtAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-       'rest_framework.permissions.IsAuthenticated',
-    ),
-    
-}
-
-
 import re
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http?:\/\/localhost(:\d+)?$",
-    r"^http?:\/\/([a-zA-Z0-9-]+)\.frontend\.localhost(:\d+)?$",
+    r"^http?:\/\/([a-zA-Z0-9-]+)\.localhost(:\d+)?$",
 ]
 
 
@@ -90,6 +77,22 @@ CORS_ALLOW_HEADERS = [
     "origin",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+
+
+
+
+REST_FRAMEWORK  = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+       'app.authenticate.CustomJwtAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+       'rest_framework.permissions.IsAuthenticated',
+    ),
+    
+}
+
+
 ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATES = [

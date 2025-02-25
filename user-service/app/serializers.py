@@ -20,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 class TenantUserSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
     tenant = serializers.PrimaryKeyRelatedField(read_only=True)
+    username = serializers.SerializerMethodField(read_only=True)
     """
     
     tenant , user , is_admin , is_staff , blocked , banned , created_at
@@ -28,8 +29,11 @@ class TenantUserSerializer(serializers.ModelSerializer):
 
         
         model = TenantUsers
-        fields = ['tenant', 'user', 'is_admin', 'is_staff', 'blocked', 'banned', 'created_at' , 'id']
+        fields = ['tenant', 'user', 'is_admin', 'is_staff', 'blocked', 'banned', 'created_at' , 'id' ,'username']
         read_only_fields = ['created_at']
+
+    def get_username(self,obj):
+        return obj.user.username
 
 
 

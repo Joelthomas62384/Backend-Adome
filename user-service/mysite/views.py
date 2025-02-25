@@ -88,6 +88,7 @@ class LoginView(APIView):
 
 
     def post(self,request, *args,**kwargs):
+        print(request.path_info)
         try:
             code = request.data.get('code')
             state = request.data.get('state')
@@ -96,10 +97,13 @@ class LoginView(APIView):
                 return Response({"app" : request.tenant.subdomain})
             # print(code , state)
             if error:
+                print("error")
                 return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
             frontend = dotenv_values(".env")["FRONTEND_URL"]
             redirect_uri = f"{frontend}/auth/callback"
+            print(redirect_uri)
             if error or not state :
+                print("error or not state")
                 return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
             token_url = "https://oauth2.googleapis.com/token"
             env = dotenv_values(".env")
@@ -111,12 +115,15 @@ class LoginView(APIView):
                 "redirect_uri": redirect_uri,
                 "grant_type": "authorization_code"
             }
-
+            print(code)
+            print(error)
             token_response = requests.post(token_url,data=token_data)
             token_json = token_response.json()
             access_token = token_json.get('access_token')
-            if token_json.get('error'):
-                return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
+            # if token_json.get('error'):
+            #     print("token json error")
+            #     print(token_json.get('error'))
+            #     return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
 
         
         
@@ -150,35 +157,43 @@ class LoginView(APIView):
 
             print(user)
         
-            app = None
+            app = request.tenant
         
-            if state:
-                app = Tenants.objects.get(subdomain=state)
-                tenantuser , create = TenantUsers.objects.get_or_create(tenant=app, user=user )
-                if create:
-                    tenantuser.save()
+            if state == 'public':
+                tenantuser = TenantUsers.objects.filter(user=user , is_admin=True)
+                if tenantuser.exists():
+                    tenantuser = tenantuser.first()
+                    app = tenantuser.tenant
                 else:
-                    if TenantUsers.objects.filter(user=user , is_admin=True).exists():
-                        app = TenantUsers.objects.get(user=user , is_admin=True).tenant
-                        print(app)
-                
+                    tenantuser , created = TenantUsers.objects.get_or_create(user=user , tenant=request.tenant)
+                    # app = request.tenant
+                    # print(tenantuser)
+                    
+            else:
+                tenant = request.tenant
+                tenantuser , created = TenantUsers.objects.get_or_create(user = user , tenant=tenant)
+
+
+            # print(app)
             refresh = RefreshToken.for_user(user)
             refresh['is_superuser'] = user.is_superuser
             refresh['is_staff'] = tenantuser.is_staff
             refresh['is_admin'] = tenantuser.is_admin
             refresh['banned'] = tenantuser.banned
             refresh['blocked'] = tenantuser.blocked
-            refresh['tenant'] = app.subdomain
+            if app:
+                refresh['tenant'] = app.subdomain
 
             access = str(refresh.access_token)
             access_token = AccessToken(access)
             expiration_timestamp = access_token['exp']
 
-            response = Response({'app':app.subdomain}, status=status.HTTP_200_OK)
+            response = Response({'app':app.subdomain if app else "public" ,'refresh' : str(refresh) , 'access' :access , 'expiry' : expiration_timestamp}, status=status.HTTP_200_OK)
             response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True)
             response.set_cookie(key='access_token',  value = access, secure=True , httponly=True , samesite= "None")
             response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
             response.set_cookie(key='user_email', value=user.email, secure=True, httponly=True, samesite="None")
+            print("cookies are set")
             return response
         except requests.exceptions.RequestException as e:
             print(e)
@@ -223,10 +238,10 @@ class RefreshTokenView(APIView):
             access_token = AccessToken(access)
             expiration_timestamp = access_token['exp']
 
-            response = Response(status=status.HTTP_200_OK)
+            response = Response({'refresh' : str(refresh) , 'access' :access , 'expiry' : expiration_timestamp},status=status.HTTP_200_OK)
             response.set_cookie(key='refresh_token', value=str(refresh), secure=True, httponly=True, samesite="None")
             response.set_cookie(key='access_token', value=access, secure=True, httponly=True, samesite="None")
-            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
+            response.set_cookie(key='expiry', value= expiration_timestamp   , secure=True, httponly=False, samesite="None")
             return response
         except Exception as e:
             response = Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -234,7 +249,7 @@ class RefreshTokenView(APIView):
             response.delete_cookie('access_token', domain=None)
             response.delete_cookie('expiry', domain=None)
             return response
-
+    
 
 class GetUserView(APIView):
     # authentication_classes = [CustomJwtAuthentication]
@@ -256,3 +271,11 @@ class LogoutView(APIView):
         response.delete_cookie('access_token', domain=None)
         response.delete_cookie('expiry', domain=None)
         return response
+    
+
+class GetTenantUsersView(APIView):
+    def get(self, request):
+        tenant = request.tenant
+        tenantusers = TenantUsers.objects.filter(tenant=tenant)
+        serializer = TenantUserSerializer(tenantusers, many=True)
+        return Response(serializer.data)

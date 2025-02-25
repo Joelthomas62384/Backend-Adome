@@ -9,5 +9,6 @@ urlpatterns = [
     path('refresh' , RefreshTokenView.as_view()),
     path('data-login' , LoginDataView.as_view()),
     path('logout' , LogoutView.as_view()),
-    path('me' , GetUserView.as_view())
+    path('me' , GetUserView.as_view()),
+    path('tenantusers' , GetTenantUsersView.as_view()),
 ]
