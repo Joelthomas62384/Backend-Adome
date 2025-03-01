@@ -38,9 +38,9 @@ class LoginDataView(APIView):
             expiration_timestamp = access_token['exp']
 
             response = Response( status=status.HTTP_200_OK)
-            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True)
+            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None", domain='.localhost' , secure=True)
             response.set_cookie(key='access_token',  value = access, secure=True , httponly=True , samesite= "None")
-            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
+            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None", domain='.localhost')
             return response
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -80,6 +80,8 @@ class LoginView(APIView):
         user_email = request.COOKIES.get('user_email')
         if user_email:
             params["login_hint"] = user_email
+        else:
+            params['prompt'] = 'select_account'
        
         url = f"https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}"
         return redirect(url)
@@ -189,10 +191,10 @@ class LoginView(APIView):
             expiration_timestamp = access_token['exp']
 
             response = Response({'app':app.subdomain if app else "public" ,'refresh' : str(refresh) , 'access' :access , 'expiry' : expiration_timestamp}, status=status.HTTP_200_OK)
-            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True)
+            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None", domain='.localhost' , secure=True)
             response.set_cookie(key='access_token',  value = access, secure=True , httponly=True , samesite= "None")
-            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
-            response.set_cookie(key='user_email', value=user.email, secure=True, httponly=True, samesite="None")
+            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None", domain='.localhost')
+            response.set_cookie(key='user_email', value=user.email, secure=True, httponly=True, samesite="None", domain='.localhost')
             print("cookies are set")
             return response
         except requests.exceptions.RequestException as e:
@@ -239,9 +241,9 @@ class RefreshTokenView(APIView):
             expiration_timestamp = access_token['exp']
 
             response = Response({'refresh' : str(refresh) , 'access' :access , 'expiry' : expiration_timestamp},status=status.HTTP_200_OK)
-            response.set_cookie(key='refresh_token', value=str(refresh), secure=True, httponly=True, samesite="None")
-            response.set_cookie(key='access_token', value=access, secure=True, httponly=True, samesite="None")
-            response.set_cookie(key='expiry', value= expiration_timestamp   , secure=True, httponly=False, samesite="None")
+            response.set_cookie(key='refresh_token', value=str(refresh), secure=True, httponly=True, samesite="None", domain='.localhost')
+            response.set_cookie(key='access_token', value=access, secure=True, httponly=True, samesite="None", domain='.localhost')
+            response.set_cookie(key='expiry', value= expiration_timestamp   , secure=True, httponly=False, samesite="None", domain='.localhost')
             return response
         except Exception as e:
             response = Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

@@ -11,7 +11,7 @@ django.setup()
 import pika 
 import json
 import logging
-from  consume_utils import  user_callback
+from  consume_utils import  user_callback , tenant_callback
 
 
 
@@ -36,6 +36,9 @@ def callback(ch, method, properties, body):
     if contenttype == 'user':
         user_callback(ch , event_type , data , method)
         logging.info('user callback done')
+    elif contenttype == 'tenant':
+        tenant_callback(ch , event_type , data , method)
+        logging.info('tenant callback done')
 
 
 

@@ -33,6 +33,7 @@ class Tenants(models.Model):
     community = models.BooleanField(default=False)
     newsletter = models.BooleanField(default=False)
     subdomain = models.CharField(max_length=150 ,unique=True)
+    courses = models.BooleanField(default=False)
     admin = models.ForeignKey(UserCache, on_delete=models.CASCADE)
 
 

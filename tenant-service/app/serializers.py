@@ -11,7 +11,7 @@ class TenantSerializer(serializers.ModelSerializer):
         fields = [
 
            'id' ,'name', 'domain', 'contact_email', 
-            'location', 'description', 'blog', 'community', 'newsletter'  , 'admin' , 'subscription_plan' , 'subdomain' , 'contact_email' , 'logo'
+            'location', 'description', 'blog', 'community', 'newsletter'  , 'admin' , 'subscription_plan' , 'courses', 'subdomain' , 'contact_email' , 'logo'
         ]
         read_only_fields = ['id']
     def create(self, validated_data):
