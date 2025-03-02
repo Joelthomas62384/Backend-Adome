@@ -63,29 +63,17 @@ REST_FRAMEWORK  = {
 }
 
 
-
-import re
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http?:\/\/localhost(:\d+)?$",
-    r"^http?:\/\/([a-zA-Z0-9-]+)\.frontend\.localhost(:\d+)?$",
-]
-
+BASE_DOMAIN = os.getenv("BASE_DOMAIN", "localhost:3000")  
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000", 
+    f"https://*.{BASE_DOMAIN}",  
+    "http://localhost:3000",  
 ]
 
-CORS_ALLOW_HEADERS = [
-    "content-type",
-    "authorization",
-    "x-csrftoken",
-    "x-requested-with",
-    "accept",
-    "accept-encoding",
-    "origin",
-]
+CORS_ALLOW_ALL_ORIGINS = True 
 CORS_ALLOW_CREDENTIALS = True
-
+CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+CORS_ALLOW_HEADERS = ["*"]
 
 ROOT_URLCONF = 'mysite.urls'
 

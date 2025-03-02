@@ -122,10 +122,7 @@ class LoginView(APIView):
             token_response = requests.post(token_url,data=token_data)
             token_json = token_response.json()
             access_token = token_json.get('access_token')
-            # if token_json.get('error'):
-            #     print("token json error")
-            #     print(token_json.get('error'))
-            #     return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
+           
 
         
         
@@ -168,8 +165,7 @@ class LoginView(APIView):
                     app = tenantuser.tenant
                 else:
                     tenantuser , created = TenantUsers.objects.get_or_create(user=user , tenant=request.tenant)
-                    # app = request.tenant
-                    # print(tenantuser)
+                   
                     
             else:
                 tenant = request.tenant
@@ -189,6 +185,7 @@ class LoginView(APIView):
             access = str(refresh.access_token)
             access_token = AccessToken(access)
             expiration_timestamp = access_token['exp']
+            
 
             response = Response({'app':app.subdomain if app else "public" ,'refresh' : str(refresh) , 'access' :access , 'expiry' : expiration_timestamp}, status=status.HTTP_200_OK)
             response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None", domain='.localhost' , secure=True)
@@ -275,9 +272,24 @@ class LogoutView(APIView):
         return response
     
 
+    
+
 class GetTenantUsersView(APIView):
     def get(self, request):
-        tenant = request.tenant
-        tenantusers = TenantUsers.objects.filter(tenant=tenant)
-        serializer = TenantUserSerializer(tenantusers, many=True)
-        return Response(serializer.data)
+        try:
+            tenant = request.tenant
+            tenantusers = TenantUsers.objects.filter(tenant=tenant)
+            serializer = TenantUserSerializer(tenantusers, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+class GetTenantUserView(APIView):
+    def get(self, request):
+        try:
+            user = request.user
+            serializer = UserTenantSerializer(user)
+            return Response({"data":serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        

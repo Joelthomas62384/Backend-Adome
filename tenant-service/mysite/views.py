@@ -34,8 +34,10 @@ class TenantView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-    def put(self,request,id):
-        tenant = Tenants.objects.get(id=id)
+    def put(self,request,subdomain):
+        import time
+        tenant = Tenants.objects.get(subdomain=subdomain)
+        # time.sleep(5)
         serializer = TenantSerializer(tenant, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -43,6 +45,15 @@ class TenantView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+class MetadataView(APIView):
+    permission_classes = []
+    authentication_classes = []
+
+    def get(self, request):
+        tenant = request.tenant
+        serializer = TenantSerializer(tenant)
+        return Response(serializer.data , status=status.HTTP_200_OK)
 
 
 

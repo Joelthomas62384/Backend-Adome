@@ -67,6 +67,7 @@ class TenantUsers(models.Model):
     blocked = models.BooleanField(default=False)
     banned = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    designation = models.CharField(max_length=100,default='' , null=True , blank=True)
 
     def __str__(self):
         return f"{self.user.username} in {self.tenant.name}"

@@ -8,5 +8,5 @@ class PaymentSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Tenants
-        fields = ['name', 'subscription', 'subdomain', 'id']
+        fields = ['name', 'subscription_plan', 'subdomain', 'id']
         read_only_fields = ['id']
