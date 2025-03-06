@@ -328,6 +328,7 @@ class GetTenantUserView(APIView):
 class BanUserView(APIView):
     def post(self, request , username):
         try:
+          
             user = User.objects.get(username=username)
             tenantuser = TenantUsers.objects.get(user=user, tenant=request.tenant)
             tenantuser.banned = not tenantuser.banned
@@ -343,6 +344,7 @@ class BanUserView(APIView):
 class BlockUserView(APIView):
     def post(self, request , username):
         try:
+            
             user = User.objects.get(username=username)
             tenantuser = TenantUsers.objects.get(user=user, tenant=request.tenant)
             tenantuser.blocked = not tenantuser.blocked

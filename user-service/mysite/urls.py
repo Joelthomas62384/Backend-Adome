@@ -13,5 +13,6 @@ urlpatterns = [
     path('tenantusers' , GetTenantUsersView.as_view()),
     path('tenantuser' , GetTenantUserView.as_view()),
     path('ban/<username>',BanUserView.as_view()),
-    path('block/<username>',BanUserView.as_view())
+    path('block/<username>',BlockUserView.as_view()),
+    path('tenantuser/<username>',TenantUserView.as_view())
 ]
