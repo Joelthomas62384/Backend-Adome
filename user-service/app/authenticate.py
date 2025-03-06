@@ -23,12 +23,17 @@ class CustomJwtAuthentication(JWTAuthentication):
             raise AuthenticationFailed("User not found.")
         
         tenant = request.tenant
+        print(f"tenant is {tenant}")
         
-        tenantuser = TenantUsers.objects.get(user=user, tenant=tenant)
+        tenantuser = TenantUsers.objects.filter(user=user, tenant=tenant)
+        # print(tenantuser)
 
-        if tenantuser is None:
+        if  tenantuser.exists() :
+            request.tenantuser = tenantuser.first()
+        elif user.is_superuser:
+            pass
+        else:
             raise AuthenticationFailed("Tenant user not found.")
-        request.tenantuser = tenantuser
         return user, validated_token 
     
 

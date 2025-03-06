@@ -11,4 +11,7 @@ urlpatterns = [
     path('logout' , LogoutView.as_view()),
     path('me' , GetUserView.as_view()),
     path('tenantusers' , GetTenantUsersView.as_view()),
+    path('tenantuser' , GetTenantUserView.as_view()),
+    path('ban/<username>',BanUserView.as_view()),
+    path('block/<username>',BanUserView.as_view())
 ]

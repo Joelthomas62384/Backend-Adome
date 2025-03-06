@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = User
-        fields = ['name', 'id' ,'email', 'full_name', 'username', 'profile_pic', 'is_staff', 'is_active', 'is_superuser', 'created_at', 'updated_at']
+        fields = [ 'id' ,'email', 'full_name', 'username', 'profile_pic', 'is_staff', 'is_active', 'is_superuser', 'created_at', 'updated_at']
         read_only_fields = ['created_at', 'updated_at' , 'id']
 
 
@@ -42,26 +42,15 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
 
-class UserTenantSerializer(serializers.ModelSerializer):
-    role = serializers.SerializerMethodField()
-    designation = serializers.SerializerMethodField()
-
+class TenantUsersSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
     class Meta:
-        model = User
-        fields = ["name" , "email" , "full_name" , "username" , "profile_pic" , "role" , "designation"]
+        model = TenantUsers
+        fields = ['tenant', 'user', 'is_admin', 'is_staff', 'blocked', 'banned', 'created_at' , 'id' ,'designation']
+        read_only_fields = ['created_at']
 
     
-    def get_role(self, obj):
-        tenant = self.context.get('request').tenant
-        tenant_user = TenantUsers.objects.get(user=obj , tenant=tenant)
-        if tenant_user:
-            if tenant.is_admin:
-                return "admin"
-            elif tenant.is_staff:
-                return "staff"  
-            else:
-                return "user"
-        return None
+    
     def get_designation(self, obj):
         tenant = self.context.get('request').tenant
         tenant_user = TenantUsers.objects.get(user=obj , tenant=tenant)
@@ -69,3 +58,27 @@ class UserTenantSerializer(serializers.ModelSerializer):
             return tenant_user.designation
         return None
             
+class UserSerializerNew(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [  'email', 'full_name', 'username', 'profile_pic']
+
+class TenantUsersSerializer(serializers.ModelSerializer):
+    user = UserSerializerNew(read_only=True)
+    role = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = TenantUsers
+        fields = ['tenant', 'user', 'role', 'blocked', 'banned', 'created_at' , 'id' ,'designation' , 'is_admin' , 'is_staff']
+        read_only_fields = ['created_at']
+
+    def get_role(self, obj):
+        tenant_user = obj
+        if tenant_user:
+            if tenant_user.is_admin:
+                return "admin"
+            elif tenant_user.is_staff:
+                return "staff"  
+            else:
+                return "user"
+        return None
+

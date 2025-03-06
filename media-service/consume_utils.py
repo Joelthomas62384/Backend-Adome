@@ -10,7 +10,7 @@ def user_callback(ch, event_type, data, method):
         user_id = data.get("id")
         if not user_id:
             logger.error("Missing user ID in event data")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
             return
 
         if event_type == "created":
@@ -44,11 +44,11 @@ def user_callback(ch, event_type, data, method):
 
     except IntegrityError as e:
         logger.error(f"Database Integrity Error: {e}")
-        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
 
     except json.JSONDecodeError as e:
         logger.error(f"Invalid JSON: {e}")
-        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
 
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
@@ -60,7 +60,7 @@ def tenant_callback(ch, event_type, data, method):
     try:
         if not isinstance(data, dict):
             logger.error(f"Invalid data type: {type(data)} - {data}")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
             return
 
         if event_type == 'created':
@@ -78,7 +78,7 @@ def tenant_callback(ch, event_type, data, method):
                 logger.info(f"Updated Tenant with id: {data['id']}")
             except Tenants.DoesNotExist:
                 logger.error(f"Tenant with id {data['id']} not found")
-                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
                 return
 
         elif event_type == 'deleted':
@@ -90,7 +90,7 @@ def tenant_callback(ch, event_type, data, method):
 
         else:
             logger.warning(f"Unknown event type: {event_type}")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
             return
 
         ch.basic_ack(delivery_tag=method.delivery_tag)

@@ -11,6 +11,8 @@ from django.contrib.auth import get_user_model
 from dotenv import dotenv_values
 from django.shortcuts import redirect
 import urllib.parse
+from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q
 
 
 
@@ -119,6 +121,8 @@ class LoginView(APIView):
             }
             print(code)
             print(error)
+            if error:
+                return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
             token_response = requests.post(token_url,data=token_data)
             token_json = token_response.json()
             access_token = token_json.get('access_token')
@@ -132,6 +136,8 @@ class LoginView(APIView):
             user_info_response = requests.get(user_info_url,params=user_info_params)
             user_info = user_info_response.json()
             print(user_info)
+            if user_info.get('error'):
+                return Response({'error': 'Error'}, status=status.HTTP_400_BAD_REQUEST)
 
 
             email = str(user_info.get('email'))
@@ -141,6 +147,8 @@ class LoginView(APIView):
             picture = user_info.get('picture')
             
             username = email.split('@')[0]
+            if not username:
+                return Response({'error': 'Error'}, status=status.HTTP_400_BAD_REQUEST)
 
 
             user, created = User.objects.get_or_create(email=email, defaults={
@@ -149,27 +157,32 @@ class LoginView(APIView):
                 "profile_pic": picture
 
             })
-
+            print(user , created)
             if created:
                 user.set_unusable_password()
                 user.save()
 
-            print(user)
+            print(user, " is user ")
+            if user is None:
+                return Response({'error': 'Error logging in try again'}, status=status.HTTP_400_BAD_REQUEST)
+
         
             app = request.tenant
         
             if state == 'public':
-                tenantuser = TenantUsers.objects.filter(user=user , is_admin=True)
+
+                tenantuser = TenantUsers.objects.filter(user=user, is_admin=True)
                 if tenantuser.exists():
                     tenantuser = tenantuser.first()
                     app = tenantuser.tenant
                 else:
-                    tenantuser , created = TenantUsers.objects.get_or_create(user=user , tenant=request.tenant)
-                   
-                    
+                    if user: 
+                        tenantuser, created = TenantUsers.objects.get_or_create(user=user, tenant=request.tenant)
             else:
-                tenant = request.tenant
-                tenantuser , created = TenantUsers.objects.get_or_create(user = user , tenant=tenant)
+                if user:
+                    tenant = request.tenant
+                    tenantuser, created = TenantUsers.objects.get_or_create(user=user, tenant=tenant)
+
 
 
             # print(app)
@@ -210,7 +223,7 @@ class RefreshTokenView(APIView):
     def post(self, request):
         token = request.COOKIES.get('refresh_token')
         old_access_token = request.COOKIES.get('access_token')
-
+        
         if not token or not old_access_token:
             return Response({'error': 'Tokens missing'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -277,19 +290,92 @@ class LogoutView(APIView):
 class GetTenantUsersView(APIView):
     def get(self, request):
         try:
+            paginator = PageNumberPagination()
+            paginator.page_size = 12
+            search = request.query_params.get('search',None)
+            if search:
+                tenantusers = TenantUsers.objects.filter(Q(user__email__icontains=search) | Q(user__full_name__icontains=search) | Q(user__username__icontains=search),tenant=request.tenant).order_by('id')
+                paged_data = paginator.paginate_queryset(tenantusers, request)
+                serializer = TenantUsersSerializer(tenantusers, many=True)
+                return paginator.get_paginated_response(serializer.data)
+            staffOnly:str = request.query_params.get('staffOnly','false')
             tenant = request.tenant
-            tenantusers = TenantUsers.objects.filter(tenant=tenant)
-            serializer = TenantUserSerializer(tenantusers, many=True)
-            return Response(serializer.data)
+            tenantusers = TenantUsers.objects.filter(Q(is_staff=True if staffOnly.lower() == 'true' else False) | Q(is_admin =True if staffOnly.lower() == 'true' else False ),tenant=tenant,).order_by('id')
+            paged_data = paginator.paginate_queryset(tenantusers, request)
+
+            serializer = TenantUsersSerializer(paged_data, many=True)
+            return paginator.get_paginated_response(serializer.data)
+            # print(serializer.data)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
     
 class GetTenantUserView(APIView):
     def get(self, request):
         try:
-            user = request.user
-            serializer = UserTenantSerializer(user)
-            return Response({"data":serializer.data}, status=status.HTTP_200_OK)
+            print(request.user)
+            print(request.tenantuser)
+            user = request.tenantuser
+            print(user)
+            serializer = TenantUsersSerializer(user, context={'request':request})
+            print(serializer.data)
+            return Response(serializer.data , status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class BanUserView(APIView):
+    def post(self, request , username):
+        try:
+            user = User.objects.get(username=username)
+            tenantuser = TenantUsers.objects.get(user=user, tenant=request.tenant)
+            tenantuser.banned = not tenantuser.banned
+            tenantuser.save()
+            serializer = TenantUsersSerializer(tenantuser)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        
+class BlockUserView(APIView):
+    def post(self, request , username):
+        try:
+            user = User.objects.get(username=username)
+            tenantuser = TenantUsers.objects.get(user=user, tenant=request.tenant)
+            tenantuser.blocked = not tenantuser.blocked
+            tenantuser.save()
+            serializer = TenantUsersSerializer(tenantuser)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+class TenantUserView(APIView):
+    def get(self, request , username):
+        try:
+            user = User.objects.get(username=username)
+            tenantuser = TenantUsers.objects.get(user=user, tenant=request.tenant)
+            serializer = TenantUsersSerializer(tenantuser)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    def patch(self ,request, username):
+        try:
+            user = User.objects.get(username=username)
+            tenantuser = TenantUsers.objects.get(user=user, tenant=request.tenant)
+            serializer = TenantUsersSerializer(tenantuser, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
