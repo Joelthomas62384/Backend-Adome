@@ -9,10 +9,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('count', type=int, help='Total number of users to be created.',default=50 , nargs='?')
+        parser.add_argument('subdomain', type=str, help='Total number of users to be created.',default="brototype" , nargs='?')
 
     def handle(self, *args, **options):
         count = options.get('count', 50)
-        tenant = Tenants.objects.get(subdomain='brototype')
+        subdomain = options.get('subdomain', 'brototype')
+        tenant = Tenants.objects.get(subdomain=subdomain)
 
         for _ in range(count):
             email = fake.email()

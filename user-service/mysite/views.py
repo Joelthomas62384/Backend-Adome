@@ -328,7 +328,10 @@ class GetTenantUserView(APIView):
 class BanUserView(APIView):
     def post(self, request , username):
         try:
-          
+            print("Ban user")
+            if not(request.tenantuser.is_admin or request.tenantuser.hasStaffPermission):
+
+                return Response({'data':"Unauthorized access"} , status=status.HTTP_401_UNAUTHORIZED)
             user = User.objects.get(username=username)
             tenantuser = TenantUsers.objects.get(user=user, tenant=request.tenant)
             tenantuser.banned = not tenantuser.banned
@@ -345,6 +348,9 @@ class BlockUserView(APIView):
     def post(self, request , username):
         try:
             
+            if not(request.tenantuser.is_admin or request.tenantuser.hasStaffPermission):
+
+                return Response({'data':"Unauthorized access"} , status=status.HTTP_401_UNAUTHORIZED)
             user = User.objects.get(username=username)
             tenantuser = TenantUsers.objects.get(user=user, tenant=request.tenant)
             tenantuser.blocked = not tenantuser.blocked

@@ -69,7 +69,7 @@ class TenantUsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenantUsers
         fields = ['tenant', 'user', 'role', 'blocked',  'banned', 'created_at' , 'id' ,'designation' , 'is_admin' , 'is_staff', 
-                  'hasStaffPermission']
+                  'hasStaffPermission', 'hasBlogPermission' , 'hasCommunityPermission' , "hasNewsletterPermission","hasCoursesPermission" , "hasBuilderPermission"]
         read_only_fields = ['created_at']
 
     def get_role(self, obj):
