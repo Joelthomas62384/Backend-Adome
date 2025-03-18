@@ -42,7 +42,8 @@ def callback(ch, method, properties, body):
 
 
 
-channel.queue_declare('media-service' , durable=True , )
+channel.queue_declare(queue='media-service', durable=True)
+
 channel.queue_bind('media-service', 'appevents', 'app.*.*')
 channel.basic_consume(queue='media-service', on_message_callback=callback, auto_ack=False)
 

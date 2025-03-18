@@ -375,6 +375,7 @@ class TenantUserView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     def patch(self ,request, username):
         try:
+            print(request.data)
             user = User.objects.get(username=username)
             tenantuser = TenantUsers.objects.get(user=user, tenant=request.tenant)
             serializer = TenantUsersSerializer(tenantuser, data=request.data, partial=True)
@@ -382,8 +383,10 @@ class TenantUserView(APIView):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
+                print(serializer.errors)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
+            print(e)
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
