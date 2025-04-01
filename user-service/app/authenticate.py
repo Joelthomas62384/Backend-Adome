@@ -23,6 +23,8 @@ class CustomJwtAuthentication(JWTAuthentication):
             raise AuthenticationFailed("User not found.")
         
         tenant = request.tenant
+
+        # if request.tenant == 
         print(f"tenant is {tenant}")
         
         tenantuser = TenantUsers.objects.filter(user=user, tenant=tenant)

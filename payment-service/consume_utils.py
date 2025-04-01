@@ -8,7 +8,7 @@ def user_callback(ch, event_type, data, method):
         user_id = data.get('id')
         if not user_id:
             logger.error(f"Missing user ID in event: {data}")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
             return
 
         if event_type == 'created':
@@ -31,7 +31,7 @@ def user_callback(ch, event_type, data, method):
                 logger.info(f"Updated user with ID: {user_id}")
             except Users.DoesNotExist:
                 logger.error(f"User with ID {user_id} not found for update")
-                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
                 return
 
         elif event_type == 'deleted':
@@ -43,7 +43,7 @@ def user_callback(ch, event_type, data, method):
 
         else:
             logger.warning(f"Unknown user event type: {event_type}")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
             return
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -58,7 +58,7 @@ def tenant_callback(ch, event_type, data, method):
         tenant_id = data.get('id')
         if not tenant_id:
             logger.error(f"Missing tenant ID in event: {data}")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
             return
 
         if event_type == 'created':
@@ -86,7 +86,7 @@ def tenant_callback(ch, event_type, data, method):
                 logger.info(f"Updated tenant with ID: {tenant_id}")
             except Tenants.DoesNotExist:
                 logger.error(f"Tenant with ID {tenant_id} not found for update")
-                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
                 return
 
         elif event_type == 'deleted':
@@ -98,7 +98,7 @@ def tenant_callback(ch, event_type, data, method):
 
         else:
             logger.warning(f"Unknown tenant event type: {event_type}")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
             return
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -113,7 +113,7 @@ def tenantuser_callback(ch, event_type, data, method):
         tenant_user_id = data.get('id')
         if not tenant_user_id:
             logger.error(f"Missing tenant-user ID in event: {data}")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
             return
 
         if event_type == 'created':
@@ -124,7 +124,7 @@ def tenantuser_callback(ch, event_type, data, method):
                 logger.info(f"Created tenant-user association: {data}")
             except (Tenants.DoesNotExist, Users.DoesNotExist) as e:
                 logger.error(f"Error creating tenant-user association: {e}")
-                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
                 return
 
         elif event_type == 'updated':
@@ -137,7 +137,7 @@ def tenantuser_callback(ch, event_type, data, method):
                 logger.info(f"Updated tenant-user with ID: {tenant_user_id}")
             except TenantUsers.DoesNotExist:
                 logger.error(f"TenantUser with ID {tenant_user_id} not found for update")
-                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
                 return
 
         elif event_type == 'deleted':
@@ -149,7 +149,7 @@ def tenantuser_callback(ch, event_type, data, method):
 
         else:
             logger.warning(f"Unknown tenant-user event type: {event_type}")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
             return
 
         ch.basic_ack(delivery_tag=method.delivery_tag)

@@ -7,13 +7,13 @@ def user_callback(ch, event_type, data, method):
     try:
         if not isinstance(data, dict):
             logger.error(f"Invalid data type received: {type(data)} - {data}")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)  
             return
 
         user_id = data.get('id')
         if not user_id:
             logger.error("User ID missing in event data")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)  
             return
 
         if event_type == 'created':
@@ -30,7 +30,7 @@ def user_callback(ch, event_type, data, method):
                 logger.info(f"Updated user with ID: {user_id}")
             except Users.DoesNotExist:
                 logger.error(f"User with ID {user_id} not found for update")
-                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+                ch.basic_ack(delivery_tag=method.delivery_tag) 
                 return
 
         elif event_type == 'deleted':
@@ -39,17 +39,16 @@ def user_callback(ch, event_type, data, method):
                 logger.info(f"Deleted user with ID: {user_id}")
             except Users.DoesNotExist:
                 logger.warning(f"User with ID {user_id} not found for deletion")
-                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+                ch.basic_ack(delivery_tag=method.delivery_tag)  
                 return
 
         else:
             logger.warning(f"Unknown event type: {event_type}")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False) 
             return
 
-        # ✅ Acknowledge message only if everything went well
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+        ch.basic_ack(delivery_tag=method.delivery_tag)  
 
     except Exception as e:
         logger.error(f"Processing error: {e}", exc_info=True)
-        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True) 

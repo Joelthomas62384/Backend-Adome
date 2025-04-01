@@ -52,7 +52,7 @@ def user_callback(ch, event_type, data, method):
 
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
-        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
 
 
 
@@ -97,4 +97,4 @@ def tenant_callback(ch, event_type, data, method):
 
     except Exception as e:
         logger.error(f"Processing error: {e}", exc_info=True)
-        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)

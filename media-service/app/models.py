@@ -28,3 +28,13 @@ class LogoImages(models.Model):
     def __str__(self):
         return f"Logo of {self.user.username}"
     
+
+
+class TenantImageBucket(models.Model):
+    tenant = models.ForeignKey(Tenants, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='tenant_images/')
+    content_type = models.CharField(max_length=50)
+    user = models.ForeignKey(UserCache, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"Image of {self.tenant.subdomain} uploaded by {self.user.username}"

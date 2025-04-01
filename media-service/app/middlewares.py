@@ -1,5 +1,6 @@
 from django.utils.deprecation import MiddlewareMixin
 from django.http import JsonResponse
+from . models import Tenants
 
 class TenantMiddleware(MiddlewareMixin):
     def process_request(self, request):
@@ -14,9 +15,9 @@ class TenantMiddleware(MiddlewareMixin):
 
         service, tenant_subdomain, *newpath = path
 
-        # tenant = Tenants.objects.filter(subdomain=tenant_subdomain).first()
+        tenant = Tenants.objects.filter(subdomain=tenant_subdomain).first()
         # if not tenant:
         #     return JsonResponse({'error': 'Invalid tenant'}, status=404)
 
-        # request.tenant = tenant
+        request.tenant = tenant
         request.path_info = "/" + "/".join(newpath)
