@@ -108,6 +108,7 @@ def tenant_callback(ch, event_type, data, method):
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
 
 
+
 def tenantuser_callback(ch, event_type, data, method):
     try:
         tenant_user_id = data.get('id')

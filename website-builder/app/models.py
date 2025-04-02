@@ -3,6 +3,7 @@ from django.db import models
 
 
 
+
 class UserCache(models.Model):
     """
     [ id, name , email , full_name , username , profile_pic , is_staff , is_active , is_superuser , created_at , updated_at]
@@ -30,7 +31,7 @@ class Tenants(models.Model):
 
     def __str__(self):
         return self.name
-
+    
 
 class TenantUsers(models.Model):
     user = models.ForeignKey(UserCache , on_delete=models.CASCADE)
@@ -44,11 +45,3 @@ class TenantUsers(models.Model):
 
     def __str__(self):
         return self.user.username + ' in ' + self.tenant.name
-    
-    class Meta:
-        unique_together = ('tenant', 'user')
-        verbose_name = 'Tenant User'
-        verbose_name_plural = 'Tenant Users'
-    
-
-    

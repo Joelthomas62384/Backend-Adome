@@ -49,6 +49,13 @@ spec:
             name: payment-service
             port:
               number: 8000
+      - path: /blog(/|$)(.*)  
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: blog-service
+            port:
+              number: 8000
 
       - path: /static(/|$)(.*)  
         pathType: ImplementationSpecific

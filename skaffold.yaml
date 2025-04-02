@@ -4,49 +4,60 @@ metadata:
   name: backend
 build:
   artifacts:
+    - image: joelthomas1103/blog
+      context: blog-service
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "**/*.py"
+            dest: "/app"
+          - src: "!**/consumer.py"
+            dest: "/app"
     - image: joelthomas1103/media
       context: media-service
       docker:
         dockerfile: Dockerfile
       sync:
         manual:
-          - src: '**/*.py'
-            dest: '/app'
-          - src: '!**/consumer.py'
-            dest: '/app'
+          - src: "**/*.py"
+            dest: "/app"
+          - src: "!**/consumer.py"
+            dest: "/app"
     - image: joelthomas1103/payment
       context: payment-service
       docker:
         dockerfile: Dockerfile
       sync:
         manual:
-          - src: '**/*.py'
-            dest: '/app'
-          - src: '!**/consumer.py'
-            dest: '/app'
+          - src: "**/*.py"
+            dest: "/app"
+          - src: "!**/consumer.py"
+            dest: "/app"
     - image: joelthomas1103/tenant
       context: tenant-service
       docker:
         dockerfile: Dockerfile
       sync:
         manual:
-          - src: '**/*.py'
-            dest: '/app'
-          - src: '!**/consumer.py'
-            dest: '/app'
+          - src: "**/*.py"
+            dest: "/app"
+          - src: "!**/consumer.py"
+            dest: "/app"
     - image: joelthomas1103/user
       context: user-service
       docker:
         dockerfile: Dockerfile
       sync:
         manual:
-          - src: '**/*.py'
-            dest: '/app'
-          - src: '!**/consumer.py'
-            dest: '/app'
+          - src: "**/*.py"
+            dest: "/app"
+          - src: "!**/consumer.py"
+            dest: "/app"
 manifests:
   rawYaml:
     - k8s/postgres-init-configmap.yml
+    - k8s/deployments/blog-deplment.yml
     - k8s/deployments/db-deployment.yml
     - k8s/deployments/media-deployment.yml
     - k8s/deployments/payment-deployment.yml
@@ -54,4 +65,4 @@ manifests:
     - k8s/deployments/tenant-deployment.yml
     - k8s/deployments/user-deployment.yml
     - k8s/ingress/ingress.yml
-
+    - k8s/secrets/secret.yml

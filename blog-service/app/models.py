@@ -30,7 +30,7 @@ class Tenants(models.Model):
 
     def __str__(self):
         return self.name
-
+    
 
 class TenantUsers(models.Model):
     user = models.ForeignKey(UserCache , on_delete=models.CASCADE)
@@ -41,14 +41,24 @@ class TenantUsers(models.Model):
     banned = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
-    def __str__(self):
-        return self.user.username + ' in ' + self.tenant.name
-    
     class Meta:
         unique_together = ('tenant', 'user')
         verbose_name = 'Tenant User'
         verbose_name_plural = 'Tenant Users'
+
+
+    def __str__(self):
+        return self.user.username + ' in ' + self.tenant.name
     
 
-    
+
+
+class Blog(models.Model):
+    user = models.ForeignKey(TenantUsers, on_delete=models.CASCADE)
+    tenant = models.ForeignKey(Tenants, on_delete=models.CASCADE,null=True , blank=True)
+    title = models.CharField(max_length=100)
+    image = models.TextField()
+    content = models.TextField()
+    published = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

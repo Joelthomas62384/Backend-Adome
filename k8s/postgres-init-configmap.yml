@@ -8,3 +8,5 @@ data:
     CREATE DATABASE tenant_service;
     CREATE DATABASE media_service;
     CREATE DATABASE payment_service;
+    CREATE DATABASE blog_service;
+    CREATE DATABASE webbuilder_service;

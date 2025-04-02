@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blog
+  template:
+    metadata:
+      labels:
+        app: blog
+    spec:
+      initContainers:
+        - name: wait-for-rootdb
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z rootdb 5432; do echo "Waiting for rootdb..."; sleep 2; done']
+
+        - name: wait-for-rabbitmq
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo "Waiting for rabbitmq..."; sleep 2; done']
+      
+      containers:
+        - name: blog
+          image: joelthomas1103/blog:latest 
+          ports:
+            - containerPort: 8000  
+          env:
+            - name: DB_HOST
+              value: "rootdb"  
+            - name: DB_NAME
+              value: "root"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              value: "root"
+            - name: SECRET_KEY  # Getting from secret
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: SECRET_KEY
+          volumeMounts:
+            - name: blog-storage
+              mountPath: /app/blog_data/  
+      
+      volumes:
+        - name: blog-storage
+          persistentVolumeClaim:
+            claimName: shared-migrations-pvc 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blog-service
+spec:
+  selector:
+    app: blog  
+  ports:
+    - protocol: TCP
+      port: 8000          
+      targetPort: 8000    
+  type: ClusterIP       
