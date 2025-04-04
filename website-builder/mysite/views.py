@@ -26,10 +26,10 @@ class WebsiteApiView(APIView):
     def put(self ,request , id):
         website = Website.objects.filter(tenant=request.tenant, id=id).first()
         if not website:
-            return Response({'data': 'Website not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'data': 'Website not found'}, status=status.HTTP_404_NOT_FOUND)    
         serializer = WebsiteSerialzer(website, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(is_default=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     def delete(self, request, id):
@@ -46,9 +46,24 @@ class GetWebsiteView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    def get(self, request):
-        website = Website.objects.filter(tenant=request.tenant, is_default=True).first()
+    def get(self, request, id):
+        website = Website.objects.filter(tenant=request.tenant, id=id).first()
         if not website:
             return Response({'data': 'Website not found'}, status=status.HTTP_404_NOT_FOUND)
         serializer = WebsiteSerialzer(website, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class GetTenantDefaultWebpage(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+
+    def get(self, request):
+        website = Website.objects.filter(tenant=request.tenant , is_default=True)
+        # print(website.first().web_data)
+        if not website.exists():
+            return Response({'data' : "Website not found"} , status=status.HTTP_404_NOT_FOUND)
+        serializer = WebsiteSerialzer(website.first() , context = {'request' , request})
+        return Response(serializer.data , status=status.HTTP_200_OK)
