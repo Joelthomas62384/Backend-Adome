@@ -56,6 +56,13 @@ spec:
             name: blog-service
             port:
               number: 8000
+      - path: /builder(/|$)(.*)  
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: webbuilder-service
+            port:
+              number: 8000
 
       - path: /static(/|$)(.*)  
         pathType: ImplementationSpecific

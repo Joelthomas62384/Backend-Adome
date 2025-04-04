@@ -59,6 +59,8 @@ class BlogDetailView(APIView):
 
 
 class GetblogView(APIView):
+    authentication_classes = []
+    permission_classes = []
     def get(self, request, pk):
         blog = Blog.objects.filter(tenant=request.tenant, pk=pk).first()
         if not blog:

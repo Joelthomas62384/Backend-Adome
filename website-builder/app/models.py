@@ -45,3 +45,20 @@ class TenantUsers(models.Model):
 
     def __str__(self):
         return self.user.username + ' in ' + self.tenant.name
+
+
+
+class Website(models.Model):
+    title = models.CharField(max_length=100,null=True , blank=True)
+
+    tenant = models.ForeignKey(Tenants, on_delete=models.CASCADE)
+    web_data = models.JSONField(null=True , blank=True)
+    created_at = models.DateTimeField(auto_now_add=True , null=True , blank=True)
+    updated_at = models.DateTimeField(auto_now=True , null=True , blank=True)
+    is_default = models.BooleanField(default=False)
+    live_mode = models.BooleanField(default=False)
+
+
+
+    def __str__(self):
+        return self.tenant
