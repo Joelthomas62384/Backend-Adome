@@ -39,6 +39,9 @@ def callback(ch, method, properties, body):
     elif contenttype == 'tenant':
         tenant_callback(ch , event_type , data , method)
         logging.info('tenant callback done')
+    else:
+        logging.warning(f"Unhandled content type: {contenttype}")
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
 
 

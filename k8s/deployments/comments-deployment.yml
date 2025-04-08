@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: comment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: comment
+  template:
+    metadata:
+      labels:
+        app: comment
+    spec:
+      initContainers:
+        - name: wait-for-rootdb
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z rootdb 5432; do echo "Waiting for rootdb..."; sleep 2; done']
+
+        - name: wait-for-rabbitmq
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo "Waiting for rabbitmq..."; sleep 2; done']
+      
+      containers:
+        - name: comment
+          image: joelthomas1103/comment:latest 
+          ports:
+            - containerPort: 8000  
+          env:
+            - name: DB_HOST
+              value: "rootdb"  
+            - name: DB_NAME
+              value: "root"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              value: "root"
+            - name: SECRET_KEY  # Getting from secret
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: SECRET_KEY
+          volumeMounts:
+            - name: comment-storage
+              mountPath: /app/comment_data/  
+      
+      volumes:
+        - name: comment-storage
+          persistentVolumeClaim:
+            claimName: shared-migrations-pvc 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: comment-service
+spec:
+  selector:
+    app: comment  
+  ports:
+    - protocol: TCP
+      port: 8000          
+      targetPort: 8000    
+  type: ClusterIP       

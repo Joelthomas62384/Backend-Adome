@@ -59,6 +59,8 @@ class Blog(models.Model):
     title = models.CharField(max_length=100)
     image = models.TextField()
     content = models.TextField()
+    htmlContent = models.TextField(null=True , blank=True)
+    JsonContent = models.JSONField(null=True , blank=True)
     published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

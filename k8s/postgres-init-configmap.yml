@@ -10,3 +10,5 @@ data:
     CREATE DATABASE media_service;
     CREATE DATABASE payment_service;
     CREATE DATABASE blog_service;
+    CREATE DATABASE comment_service;
+    CREATE DATABASE course_service;

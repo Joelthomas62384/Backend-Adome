@@ -35,6 +35,9 @@ def callback(ch, method, properties, body):
     if contenttype == 'user':
         user_callback(ch , event_type , data , method)
         logging.info('user callback done')
+    else:
+        logging.warning(f"Unhandled content type: {contenttype}")
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
 
 

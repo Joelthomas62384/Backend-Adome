@@ -71,4 +71,20 @@ spec:
             name: media-service
             port:
               number: 8000
+
+      - path: /comment(/|$)(.*)  
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: media-service
+            port:
+              number: 8000
+      - path: /course(/|$)(.*)  
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: media-service
+            port:
+              number: 8000
+      
       

@@ -8,6 +8,7 @@ build:
       context: blog-service
       docker:
         dockerfile: Dockerfile
+
       sync:
         manual:
           - src: "**/*.py"
@@ -16,11 +17,40 @@ build:
             dest: "/app"
 
 
+    - image: joelthomas1103/comment
+      context: comment-service
+      docker:
+        dockerfile: Dockerfile
+
+
+      sync:
+        manual:
+          - src: "**/*.py"
+            dest: "/app"
+          - src: "!**/consumer.py"
+            dest: "/app"
+
+
+    - image: joelthomas1103/course
+      context: course-service
+      docker:
+        dockerfile: Dockerfile
+
+        
+      sync:
+        manual:
+          - src: "**/*.py"
+            dest: "/app"
+          - src: "!**/consumer.py"
+            dest: "/app"
+
 
     - image: joelthomas1103/media
       context: media-service
       docker:
         dockerfile: Dockerfile
+
+        
       sync:
         manual:
           - src: "**/*.py"
@@ -33,6 +63,8 @@ build:
       context: payment-service
       docker:
         dockerfile: Dockerfile
+
+        
       sync:
         manual:
           - src: "**/*.py"
@@ -45,6 +77,8 @@ build:
       context: tenant-service
       docker:
         dockerfile: Dockerfile
+
+        
       sync:
         manual:
           - src: "**/*.py"
@@ -57,19 +91,22 @@ build:
       context: user-service
       docker:
         dockerfile: Dockerfile
+
+        
       sync:
         manual:
           - src: "**/*.py"
             dest: "/app"
           - src: "!**/consumer.py"
             dest: "/app"
-
 
 
     - image: joelthomas1103/webbuilder
       context: website-builder
       docker:
         dockerfile: Dockerfile
+
+        
       sync:
         manual:
           - src: "**/*.py"
@@ -77,12 +114,13 @@ build:
           - src: "!**/consumer.py"
             dest: "/app"
 
-            
+
 manifests:
   rawYaml:
-    - k8s/secrets/secret.yml
     - k8s/postgres-init-configmap.yml
     - k8s/deployments/blog-deplment.yml
+    - k8s/deployments/comments-deployment.yml
+    - k8s/deployments/course-deployment.yml
     - k8s/deployments/db-deployment.yml
     - k8s/deployments/media-deployment.yml
     - k8s/deployments/payment-deployment.yml
@@ -91,3 +129,4 @@ manifests:
     - k8s/deployments/user-deployment.yml
     - k8s/deployments/webbuilder-deployment.yml
     - k8s/ingress/ingress.yml
+    - k8s/secrets/secret.yml
