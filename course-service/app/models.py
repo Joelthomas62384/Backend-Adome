@@ -46,3 +46,34 @@ class TenantUsers(models.Model):
     def __str__(self):
         return self.user.username + ' in ' + self.tenant.name
 
+
+
+
+
+class Course(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    tenant = models.ForeignKey(Tenants, on_delete=models.CASCADE)
+    thumbnail = models.TextField()
+    price = models.FloatField()
+    published = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+
+
+class Chapter(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    has_video = models.BooleanField(default=True)
+    video = models.TextField(null=True , blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    preview = models.BooleanField(default=False)
+
+
+
+
+
+

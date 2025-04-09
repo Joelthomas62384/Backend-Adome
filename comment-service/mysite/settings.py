@@ -15,12 +15,12 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+import os
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2p#tce3n5c4@c&2d4pk7tbm^1^^-b44c%hxbet4t*wfcx1tcf)'
+SECRET_KEY = os.getenv('SECRET_KEY','slfkjslfkj')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -54,7 +54,6 @@ MIDDLEWARE = [
     'app.middlewares.TenantMiddleware',
 ]
 
-
 import re
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http?:\/\/localhost(:\d+)?$",
@@ -76,6 +75,8 @@ CORS_ALLOW_HEADERS = [
     "origin",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+
 
 
 
@@ -108,6 +109,8 @@ REST_FRAMEWORK  = {
     ),
     
 }
+# settings.py
+APPEND_SLASH = False
 
 
 

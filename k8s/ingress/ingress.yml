@@ -76,14 +76,14 @@ spec:
         pathType: ImplementationSpecific
         backend:
           service:
-            name: media-service
+            name: comment-service
             port:
               number: 8000
       - path: /course(/|$)(.*)  
         pathType: ImplementationSpecific
         backend:
           service:
-            name: media-service
+            name: course-service
             port:
               number: 8000
       
