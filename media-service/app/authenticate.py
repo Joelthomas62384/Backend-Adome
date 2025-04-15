@@ -3,6 +3,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.contrib.auth.models import AnonymousUser
 from . models import  UserCache
+from rest_framework_simplejwt.tokens import AccessToken
 
 class CustomJwtAuthentication(JWTAuthentication):
     def __init__(self, *args, **kwargs):
@@ -24,6 +25,9 @@ class CustomJwtAuthentication(JWTAuthentication):
 
         if user is None:
             raise AuthenticationFailed("User not found.")
+        access = AccessToken(raw_token)
+        if access['tenant'] != request.tenant.subdomain :
+            return None
         
         
      

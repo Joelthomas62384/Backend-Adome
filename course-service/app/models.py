@@ -62,10 +62,19 @@ class Course(models.Model):
 
 
 
+class Module(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 
 class Chapter(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
+    module = models.ForeignKey(Module, on_delete=models.CASCADE , null=True ,blank=True)
     has_video = models.BooleanField(default=True)
     video = models.TextField(null=True , blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

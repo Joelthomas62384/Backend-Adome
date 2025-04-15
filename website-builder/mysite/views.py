@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from app.models import *
 from .serializers import *
+from .scope_decorator import user_permission
 
-
-
+from . import constants
 
 class WebsiteApiView(APIView):
     # authentication_classes = []
@@ -15,14 +15,17 @@ class WebsiteApiView(APIView):
         queryset = Website.objects.filter(tenant=request.tenant)
         serializer = WebsiteSerialzer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
-    
+
+    @user_permission(constants.HAS_BUILDER_PERMISSION)    
     def post(self, request):
+        
         serializer = WebsiteSerialzer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(tenant=request.tenant)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @user_permission(constants.HAS_BUILDER_PERMISSION)   
     def put(self ,request , id):
         website = Website.objects.filter(tenant=request.tenant, id=id).first()
         if not website:
@@ -32,6 +35,7 @@ class WebsiteApiView(APIView):
             serializer.save(is_default=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @user_permission(constants.HAS_BUILDER_PERMISSION)   
     def delete(self, request, id):
         website = Website.objects.filter(tenant=request.tenant, id=id).first()
         if not website:

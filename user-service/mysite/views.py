@@ -13,7 +13,9 @@ from django.shortcuts import redirect
 import urllib.parse
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
-
+from .utils import create_user_scope
+from .scope_decorator import user_permission
+from . import constants
 
 
 
@@ -22,6 +24,7 @@ class LoginDataView(APIView):
     authentication_classes = []
     permission_classes = []
     def post(self, request):
+        
         data = request.data
         serializer = LoginSerializer(data =data)
         if serializer.is_valid():
@@ -34,14 +37,15 @@ class LoginDataView(APIView):
             if user is None:
                 print("error here")
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
-            refresh  = RefreshToken.for_user(user)
-            access = str(refresh.access_token)
-            access_token = AccessToken(access)
+            tokens = create_user_scope(user , request)
+            refresh = tokens['refresh']
+            access_token = tokens['access']
+
             expiration_timestamp = access_token['exp']
 
             response = Response( status=status.HTTP_200_OK)
             response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None", domain='.localhost' , secure=True)
-            response.set_cookie(key='access_token',  value = access, secure=True , httponly=True , samesite= "None")
+            response.set_cookie(key='access_token',  value = str(access_token), secure=True , httponly=True , samesite= "None")
             response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None", domain='.localhost')
             return response
         print(serializer.errors)
@@ -186,23 +190,15 @@ class LoginView(APIView):
 
 
             # print(app)
-            refresh = RefreshToken.for_user(user)
-            refresh['is_superuser'] = user.is_superuser
-            refresh['is_staff'] = tenantuser.is_staff
-            refresh['is_admin'] = tenantuser.is_admin
-            refresh['banned'] = tenantuser.banned
-            refresh['blocked'] = tenantuser.blocked
-            if app:
-                refresh['tenant'] = app.subdomain
-
-            access = str(refresh.access_token)
-            access_token = AccessToken(access)
+            tokens = create_user_scope(user , request)
+            refresh = tokens['refresh']
+            access_token = tokens['access']
             expiration_timestamp = access_token['exp']
             
 
-            response = Response({'app':app.subdomain if app else "public" ,'refresh' : str(refresh) , 'access' :access , 'expiry' : expiration_timestamp}, status=status.HTTP_200_OK)
+            response = Response({'app':app.subdomain if app else "public" ,'refresh' : str(refresh) , 'access' :str(access_token) , 'expiry' : expiration_timestamp}, status=status.HTTP_200_OK)
             response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None", domain='.localhost' , secure=True)
-            response.set_cookie(key='access_token',  value = access, secure=True , httponly=True , samesite= "None")
+            response.set_cookie(key='access_token',  value = str(access_token), secure=True , httponly=True , samesite= "None")
             response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None", domain='.localhost')
             response.set_cookie(key='user_email', value=user.email, secure=True, httponly=True, samesite="None", domain='.localhost')
             print("cookies are set")
@@ -214,8 +210,6 @@ class LoginView(APIView):
             print(e)
             return Response({'error': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
 class RefreshTokenView(APIView):
     authentication_classes = []
     permission_classes = []
@@ -223,7 +217,7 @@ class RefreshTokenView(APIView):
     def post(self, request):
         token = request.COOKIES.get('refresh_token')
         old_access_token = request.COOKIES.get('access_token')
-        
+
         if not token or not old_access_token:
             return Response({'error': 'Tokens missing'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -237,36 +231,43 @@ class RefreshTokenView(APIView):
         try:
             refresh = RefreshToken(token)
             user = User.objects.get(id=refresh['user_id'])
-            tenantuser = TenantUsers.objects.get(user=user, tenant=request.tenant)  
-            
-            refresh['is_superuser'] = user.is_superuser
-            refresh['is_staff'] = tenantuser.is_staff
-            refresh['is_admin'] = tenantuser.is_admin
-            refresh['banned'] = tenantuser.banned
-            refresh['blocked'] = tenantuser.blocked
-            refresh['tenant'] = tenantuser.tenant.subdomain
 
-            access = str(refresh.access_token)
-            access_token = AccessToken(access)
+            tokens = create_user_scope(user , request)
+            refresh = tokens['refresh']
+            access_token = tokens['access']
+            access_token = refresh.access_token
             expiration_timestamp = access_token['exp']
 
-            response = Response({'refresh' : str(refresh) , 'access' :access , 'expiry' : expiration_timestamp},status=status.HTTP_200_OK)
+            response = Response({
+                'refresh': str(refresh),
+                'access': str(access_token),
+                'expiry': expiration_timestamp
+            }, status=status.HTTP_200_OK)
+
             response.set_cookie(key='refresh_token', value=str(refresh), secure=True, httponly=True, samesite="None", domain='.localhost')
-            response.set_cookie(key='access_token', value=access, secure=True, httponly=True, samesite="None", domain='.localhost')
-            response.set_cookie(key='expiry', value= expiration_timestamp   , secure=True, httponly=False, samesite="None", domain='.localhost')
+            response.set_cookie(key='access_token', value=str(access_token), secure=True, httponly=True, samesite="None", domain='.localhost')
+            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None", domain='.localhost')
+
             return response
+
         except Exception as e:
             response = Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-            response.delete_cookie('refresh_token', domain=None)
-            response.delete_cookie('access_token', domain=None)
-            response.delete_cookie('expiry', domain=None)
+            response.delete_cookie('refresh_token', domain='.localhost')
+            response.delete_cookie('access_token', domain='.localhost')
+            response.delete_cookie('expiry', domain='.localhost')
             return response
+
     
+from app.authenticate import CustomJwtAuthentication
 
 class GetUserView(APIView):
     # authentication_classes = [CustomJwtAuthentication]
     # permission_classes = [IsAuthenticated]
+
+    # @user_permission(constants.HAS_BLOG_PERMISSION)
     def get(self,request):
+
+
         if request.user.is_authenticated:
             print(f"User: {request.user}")
             print(f"Is Authenticated: {request.user.is_authenticated}")
@@ -288,6 +289,7 @@ class LogoutView(APIView):
     
 
 class GetTenantUsersView(APIView):
+    @user_permission(constants.HAS_STAFF_PERMISSION)
     def get(self, request):
         try:
             paginator = PageNumberPagination()
@@ -311,6 +313,7 @@ class GetTenantUsersView(APIView):
     
     
 class GetTenantUserView(APIView):
+    
     def get(self, request):
         try:
             print(request.user)
@@ -326,6 +329,8 @@ class GetTenantUserView(APIView):
         
 
 class BanUserView(APIView):
+    @user_permission(constants.HAS_STAFF_PERMISSION)
+
     def post(self, request , username):
         try:
             print("Ban user")
@@ -347,6 +352,7 @@ class BanUserView(APIView):
 
 
 class BlockUserView(APIView):
+    @user_permission(constants.HAS_STAFF_PERMISSION)
     def post(self, request , username):
         try:
             
@@ -375,6 +381,8 @@ class TenantUserView(APIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    @user_permission(constants.HAS_STAFF_PERMISSION)
+    
     def patch(self ,request, username):
         try:
             print(request.data)

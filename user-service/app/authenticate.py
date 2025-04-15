@@ -3,11 +3,13 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.contrib.auth.models import AnonymousUser
 from . models import TenantUsers
+from rest_framework_simplejwt.tokens import AccessToken
 
 class CustomJwtAuthentication(JWTAuthentication):
     def authenticate(self, request):
         raw_token = request.COOKIES.get('access_token')
         refresh_token = request.COOKIES.get('refresh_token')
+        print(raw_token)
 
         if not raw_token or not refresh_token:
             return None  
@@ -25,10 +27,18 @@ class CustomJwtAuthentication(JWTAuthentication):
         tenant = request.tenant
 
         # if request.tenant == 
-        print(f"tenant is {tenant}")
+        access = AccessToken(raw_token)
+        if access['tenant'] != tenant.subdomain :
+            return None
+        # print(f"tenant is {tenant}")
+        request.scope = access['scope']
+
+
         
         tenantuser = TenantUsers.objects.filter(user=user, tenant=tenant)
         # print(tenantuser)
+
+
 
         if  tenantuser.exists() :
             request.tenantuser = tenantuser.first()
