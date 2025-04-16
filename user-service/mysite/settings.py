@@ -186,14 +186,21 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-REST_FRAMEWORK  = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-       'app.authenticate.CustomJwtAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-       'rest_framework.permissions.IsAuthenticated',
-    ),
-    
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'app.authenticate.CustomJwtAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '20/min',
+        'anon': '10/min',
+    }
 }
 
 # Password validation

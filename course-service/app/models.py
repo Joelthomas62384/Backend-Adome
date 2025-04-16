@@ -52,9 +52,11 @@ class TenantUsers(models.Model):
 
 class Course(models.Model):
     title = models.CharField(max_length=200)
-    description = models.TextField()
     tenant = models.ForeignKey(Tenants, on_delete=models.CASCADE)
     thumbnail = models.TextField()
+    content = models.TextField()
+    htmlContent = models.TextField(null=True , blank=True)
+    JsonContent = models.JSONField(null=True , blank=True)
     price = models.FloatField()
     published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -73,9 +75,11 @@ class Module(models.Model):
 
 class Chapter(models.Model):
     title = models.CharField(max_length=200)
-    description = models.TextField()
     module = models.ForeignKey(Module, on_delete=models.CASCADE , null=True ,blank=True)
     has_video = models.BooleanField(default=True)
+    content = models.TextField()
+    htmlContent = models.TextField(null=True , blank=True)
+    JsonContent = models.JSONField(null=True , blank=True)
     video = models.TextField(null=True , blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

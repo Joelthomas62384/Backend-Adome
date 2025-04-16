@@ -3,15 +3,17 @@ from app.models import Course
 
 class CourseSerializer(serializers.ModelSerializer):
     """
-    class Course(models.Model):
     title = models.CharField(max_length=200)
-    description = models.TextField()
     tenant = models.ForeignKey(Tenants, on_delete=models.CASCADE)
     thumbnail = models.TextField()
+    content = models.TextField()
+    htmlContent = models.TextField(null=True , blank=True)
+    JsonContent = models.JSONField(null=True , blank=True)
     price = models.FloatField()
     published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     """
 
     class Meta:

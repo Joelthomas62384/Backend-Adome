@@ -81,7 +81,6 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 
-
 ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATES = [
@@ -101,16 +100,23 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
-
-REST_FRAMEWORK  = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-       'app.authenticate.CustomJwtAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-       'rest_framework.permissions.IsAuthenticated',
-    ),
-    
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'app.authenticate.CustomJwtAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '20/min',
+        'anon': '10/min',
+    }
 }
+
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

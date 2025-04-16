@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from .serializers import *
 from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
+from . import constants
+from .scope_decorator import user_permission
 
 
 
@@ -31,6 +33,7 @@ class CourseCreateView(APIView):
 
 
 
+    @user_permission(constants.HAS_COURSES_PERMISSION)
     def post(self, request):
         serializer = CourseSerializer(data=request.data)
         if serializer.is_valid():
@@ -40,12 +43,13 @@ class CourseCreateView(APIView):
 
 
 
-class ListUpdateView(APIView):
+class CourseManageView(APIView):
+    @user_permission(constants.HAS_COURSES_PERMISSION)
     def get(self, request, id):
         course = get_object_or_404(Course, id=id)
         serializer = CourseSerializer(course)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
+    @user_permission(constants.HAS_COURSES_PERMISSION)
     def put(self, request, id):
         course = get_object_or_404(Course, id=id)
         serializer = CourseSerializer(course, data=request.data, partial=True)  # Use `partial=True` if you want to allow partial updates
@@ -53,7 +57,7 @@ class ListUpdateView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    @user_permission(constants.HAS_COURSES_PERMISSION)
     def delete(self, request, id):
         course = get_object_or_404(Course, id=id)
         course.delete()
