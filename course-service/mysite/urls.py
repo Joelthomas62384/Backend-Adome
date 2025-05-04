@@ -12,5 +12,11 @@ urlpatterns = [
     path('manage-modules/<id>' , ManageModules.as_view()),
     path('get-chapters/<id>' , GetAllChapters.as_view()),
     path('manage-chapters/<id>', ManageChapters.as_view()),
-    path('create-chapter', ManageChapters.as_view())
+    path('create-chapter', ManageChapters.as_view()),
+    path('preview-course/<id>' , CoursePreviewAPIView.as_view()),
+    path('watch/course/<int:id>', CourseWatchViews.as_view(), ),
+    path('my-courses' , MyCoursesView.as_view()),
 ]
+
+
+

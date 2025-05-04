@@ -1,4 +1,4 @@
-from app.models import LogoImages , UserCache, TenantImageBucket
+from app.models import LogoImages , UserCache, TenantImageBucket , TenantChapterVideo
 from rest_framework import serializers
 
 
@@ -29,4 +29,19 @@ class TenantImageBucketSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenantImageBucket
         fields = [ 'image', 'id' ,'content_type']
+        read_only_fields = ['id']
+
+
+class TenantChapterVideoSerializer(serializers.ModelSerializer):
+
+    """
+    tenant = models.ForeignKey(Tenants, on_delete=models.CASCADE)
+    video = models.FileField(upload_to='tenant_videos/')
+    user = models.ForeignKey(UserCache, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    """
+
+    class Meta:
+        model = TenantChapterVideo
+        fields = [ 'video', 'id' ]
         read_only_fields = ['id']

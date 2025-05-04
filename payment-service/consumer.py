@@ -10,7 +10,7 @@ django.setup()
 import pika 
 import json
 import logging
-from  consume_utils import  user_callback , tenant_callback , tenantuser_callback
+from  consume_utils import  user_callback , tenant_callback , tenantuser_callback , course_callback
 
 
 
@@ -45,6 +45,9 @@ def callback(ch, method, properties, body):
     elif contenttype == 'tenantuser':
         tenantuser_callback(ch , event_type , data , method)
         logging.info('tenantuser callback done')
+    elif contenttype == "course":
+        course_callback(ch , event_type , data , method)
+        logging.info('course callback done')
     else:
         logging.warning(f"Unhandled content type: {contenttype}")
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)

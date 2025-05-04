@@ -24,3 +24,12 @@ class PostTenantImageView(APIView):
             serializer.save(user=request.user, tenant=request.tenant)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PostTenantChapterVideo(APIView):
+    def post(self, request):
+        serializer = TenantChapterVideoSerializer(data = request.data,context={'request': request})
+        if serializer.is_valid():
+            serializer.save(user=request.user, tenant=request.tenant)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

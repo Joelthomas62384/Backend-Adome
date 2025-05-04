@@ -1,5 +1,5 @@
 import logging
-from app.models import UserCache as Users, Tenants, TenantUsers
+from app.models import UserCache as Users, Tenants, TenantUsers,OwnedCourse , Course
 
 logger = logging.getLogger(__name__)
 
@@ -164,4 +164,31 @@ def tenantuser_callback(ch, event_type, data, method):
 
     except Exception as e:
         logger.error(f"Error processing tenant-user event: {e}", exc_info=True)
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+
+def order_callback(ch, event_type, data, method):
+    try:
+        tenantuser = TenantUsers.objects.get(id=data['user'])
+        tenant = tenantuser.tenant
+        course = Course.objects.get(id=data['course'])
+
+        if event_type == 'created':
+            OwnedCourse.objects.create(
+                user=tenantuser,
+                course=course,
+                tenant=tenant
+            )
+            logger.info(f"Created order: {data}")
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+
+    except TenantUsers.DoesNotExist:
+        logger.error(f"Tenant user with ID {data['user']} not found")
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+
+    except Course.DoesNotExist:
+        logger.error(f"Course with ID {data['course']} not found")
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+
+    except Exception as e:
+        logger.error(f"Error processing order event: {e}", exc_info=True)
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)

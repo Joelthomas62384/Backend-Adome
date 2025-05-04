@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from . models import Tenants
+from . models import Tenants, Order
+
+
+
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -10,3 +13,9 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Tenants
         fields = ['name', 'subscription_plan', 'subdomain', 'id']
         read_only_fields = ['id']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['course' , 'user' ,'tenant' , 'course_title']

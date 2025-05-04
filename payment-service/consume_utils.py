@@ -1,5 +1,5 @@
 import logging
-from app.models import UserCache as Users, Tenants, TenantUsers
+from app.models import UserCache as Users, Tenants, TenantUsers, CourseCache
 
 logger = logging.getLogger(__name__)
 
@@ -163,4 +163,41 @@ def tenantuser_callback(ch, event_type, data, method):
 
     except Exception as e:
         logger.error(f"Error processing tenant-user event: {e}", exc_info=True)
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+
+
+
+def course_callback(ch, event_type, data, method):
+    try:
+        if event_type == "created":
+            try:
+
+                CourseCache.objects.create(
+                    id = data['id'],
+                    price = data['price'],
+                    title = data['title'],
+
+                )
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+            except Exception as e:
+                logger.error(f"Error processing course event: {e}", exc_info=True)
+                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        elif event_type == "updated":
+            try:
+                CourseCache.objects.filter(id = data['id']).update(price=data['price'])
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+            except Exception as e:
+                logger.error(f"Error processing course event: {e}", exc_info=True)
+                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        elif event_type == "deleted":
+            try:
+                CourseCache.objects.filter(id = data['id']).delete()
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+            except Exception as e:
+                logger.error(f"Error processing course event: {e}", exc_info=True)
+                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        
+
+    except Exception as e:
+        logger.error(f"Error processing course event: {e}", exc_info=True)
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)

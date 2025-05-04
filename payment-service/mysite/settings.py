@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 import os
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY','sfsfsfssasd')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -59,15 +59,16 @@ MIDDLEWARE = [
 
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000", 
-    "http://127.0.0.1:3000",
-    "https://ms-blogs.com",  
+
+import re
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http?:\/\/localhost(:\d+)?$",
+    r"^http?:\/\/([a-zA-Z0-9-]+)\.localhost(:\d+)?$",
 ]
 
+
 CSRF_TRUSTED_ORIGINS = [
-    "https://ms-blogs.com",
-    "http://localhost:3000"
+    "http://localhost:3000", 
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -79,11 +80,8 @@ CORS_ALLOW_HEADERS = [
     "accept-encoding",
     "origin",
 ]
+CORS_ALLOW_CREDENTIALS = True
 
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000"
-]
 
 ROOT_URLCONF = 'mysite.urls'
 
@@ -103,9 +101,11 @@ REST_FRAMEWORK = {
         'anon': '10/min',
     }
 }
+RAZORPAY_KEY_ID ="rzp_test_9ZeE2xdZrKQrcJ"
+RAZORPAY_KEY_SECRET = "8PxZux8G0PeJDhWcky19thM7"
 
 
-
+ENCRYPTION_KEY ="sTBALSB0Scd1mPxhuZPlH2hy--AHFR0CwdBonSgTjeQ="
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

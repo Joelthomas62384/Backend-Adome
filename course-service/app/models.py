@@ -76,7 +76,6 @@ class Module(models.Model):
 class Chapter(models.Model):
     title = models.CharField(max_length=200)
     module = models.ForeignKey(Module, on_delete=models.CASCADE , null=True ,blank=True)
-    has_video = models.BooleanField(default=True)
     content = models.TextField()
     htmlContent = models.TextField(null=True , blank=True)
     JsonContent = models.JSONField(null=True , blank=True)
@@ -88,5 +87,9 @@ class Chapter(models.Model):
 
 
 
-
-
+class OwnedCourse(models.Model) :
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    user = models.ForeignKey(TenantUsers, on_delete=models.CASCADE)
+    tenant = models.ForeignKey(Tenants, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

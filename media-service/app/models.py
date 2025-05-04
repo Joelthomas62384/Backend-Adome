@@ -38,3 +38,12 @@ class TenantImageBucket(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return f"Image of {self.tenant.subdomain} uploaded by {self.user.username}"
+    
+
+class TenantChapterVideo(models.Model):
+    tenant = models.ForeignKey(Tenants, on_delete=models.CASCADE)
+    video = models.FileField(upload_to='tenant_videos/')
+    user = models.ForeignKey(UserCache, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"Video of {self.tenant.subdomain} uploaded by {self.user.username}"

@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: community
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: community
+  template:
+    metadata:
+      labels:
+        app: community
+    spec:
+      initContainers:
+        - name: wait-for-rootdb
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z rootdb 5432; do echo "Waiting for rootdb..."; sleep 2; done']
+
+        - name: wait-for-rabbitmq
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo "Waiting for rabbitmq..."; sleep 2; done']
+        
+        - name: wait-for-redis
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z redis 6379; do echo "Waiting for Redis..."; sleep 2; done']
+
+      containers:
+        - name: community
+          image: joelthomas1103/community:latest 
+          ports:
+            - containerPort: 8000  
+          env:
+            - name: DB_HOST
+              value: "rootdb"  
+            - name: DB_NAME
+              value: "root"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              value: "root"
+            - name: SECRET_KEY  # Getting from secret
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: SECRET_KEY
+          volumeMounts:
+            - name: community-storage
+              mountPath: /app/community_data/  
+
+      volumes:
+        - name: community-storage
+          persistentVolumeClaim:
+            claimName: shared-migrations-pvc 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: community-service
+spec:
+  selector:
+    app: community  
+  ports:
+    - protocol: TCP
+      port: 8000          
+      targetPort: 8000    
+  type: ClusterIP       
