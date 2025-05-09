@@ -8,3 +8,4 @@ django-cors-headers
 python-dotenv
 requests
 channels[daphne]
+channels_redis

@@ -83,3 +83,40 @@ class TenantUsersSerializer(serializers.ModelSerializer):
                 return "user"
         return None
 
+class TotalUserSerializer(serializers.Serializer):
+    total_users  = serializers.IntegerField()
+
+
+
+
+class UserAnalyticsSerializer(serializers.Serializer):
+    month = serializers.DateTimeField()
+    joined = serializers.IntegerField()
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        formatted_month = instance['month'].strftime("%b %Y")
+        return {
+            "month": formatted_month,
+            "joined": data["joined"],
+        }
+    
+class TenantUserAnalyticsSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    profile_pic = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TenantUsers
+        fields = ['user' , 'profile_pic','created_at' , 'id']
+    
+    def get_user(self , obj):
+        try:
+            return obj.user.full_name
+        except :
+            return None
+        
+    def get_profile_pic(self, obj):
+        try:
+            return obj.user.profile_pic
+        except :
+            return None

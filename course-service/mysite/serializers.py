@@ -196,3 +196,51 @@ class OwnedCourseSerializer(serializers.ModelSerializer):
     def get_course(self, obj):
         serializer = CourseSerializer(obj.course, context=self.context)
         return serializer.data
+    
+
+class OwnedCourseAnalyticalSerializer(serializers.ModelSerializer):
+    profile_pic = serializers.SerializerMethodField(read_only=True)
+    user = serializers.SerializerMethodField(read_only=True)
+    course = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = OwnedCourse
+        # fields = "__all__"
+        exclude = ['tenant','updated_at']
+    
+    def get_profile_pic(self, obj):
+        try :
+            return obj.user.user.profile_pic
+        except Exception as e:
+            return None
+
+    def get_user(self, obj):
+        try :
+            return obj.user.user.full_name
+        except Exception as e:
+            return None
+    
+    def get_course(self, obj):
+        try:
+            return obj.course.title
+        except:
+            return None
+
+
+
+
+class CourseSalesSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    course = serializers.CharField()
+    sales = serializers.IntegerField()
+
+
+
+class MonthlySalesSerializer(serializers.Serializer):
+    month = serializers.CharField()
+    sales = serializers.IntegerField()
+
+
+class TenantSalesAnalyticsSerializer(serializers.Serializer):
+    tenant = serializers.CharField()
+    sales = MonthlySalesSerializer(many=True)

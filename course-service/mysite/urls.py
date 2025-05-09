@@ -16,6 +16,9 @@ urlpatterns = [
     path('preview-course/<id>' , CoursePreviewAPIView.as_view()),
     path('watch/course/<int:id>', CourseWatchViews.as_view(), ),
     path('my-courses' , MyCoursesView.as_view()),
+    path('course-sales' , AllCoursesSalesView.as_view()),
+    path('course-six-month' , SixMonthsCourseSales.as_view()),
+    path('course-bought' ,CourseBoughtAnalytics.as_view() )
 ]
 
 

@@ -10,11 +10,11 @@ class AuthenticationMiddleware:
         self.app = app
 
     async def __call__(self, scope, receive, send):
-        """Authenticate WebSocket connections using JWT access_token from cookies."""
         close_old_connections()
         scope['user'] = AnonymousUser()
         scope['tenant'] = None
         scope['tenantuser'] = None
+        scope['userscope'] = None
 
         cookies = scope.get("cookies", {})
         access_token = cookies.get("access_token")
@@ -24,6 +24,7 @@ class AuthenticationMiddleware:
                 token = AccessToken(access_token)
                 tenant = token['tenant']
                 user_id = token['user_id']
+                userscope = token['scope']
 
                 tenant_obj = await self.get_tenant(tenant)
                 user = await self.get_user(user_id)
@@ -37,6 +38,7 @@ class AuthenticationMiddleware:
                 scope['tenant'] = tenant_obj
                 scope['user'] = user
                 scope['tenantuser'] = tenantuser
+                scope['userscope'] = userscope
 
             except (InvalidToken, TokenError, Tenants.DoesNotExist, UserCache.DoesNotExist, TenantUsers.DoesNotExist) as e:
                 scope['user'] = AnonymousUser()

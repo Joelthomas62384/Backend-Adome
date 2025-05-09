@@ -9,6 +9,12 @@ from . import constants
 from .scope_decorator import user_permission
 
 from rest_framework import generics
+from django.utils.timezone import now
+from django.db.models import Count
+from datetime import timedelta
+from django.db.models.functions import TruncMonth
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 
 class CoursePagination(PageNumberPagination):
@@ -206,3 +212,86 @@ class MyCoursesView(APIView):
         owned_courses = OwnedCourse.objects.filter(user=request.tenantuser)
         serializer = OwnedCourseSerializer(owned_courses, many=True , context={'request': request})
         return Response(serializer.data)
+    
+
+
+
+class AllCoursesSalesView(APIView):
+    def get(self, request):
+        today = now().date()
+        six_months_ago = today - timedelta(days=180)
+
+        tenant = request.tenant
+
+        sales_data = (
+            OwnedCourse.objects
+            .filter(tenant=tenant, created_at__gte=six_months_ago)
+            .values('course__id', 'course__title')
+            .annotate(sales=Count('id'))
+        )
+
+        course_sales_map = {
+            entry['course__id']: {
+                "id": entry['course__id'],
+                "course": entry['course__title'],
+                "sales": entry['sales']
+            } for entry in sales_data
+        }
+
+        all_courses = Course.objects.filter(tenant=tenant)
+        for course in all_courses:
+            if course.id not in course_sales_map:
+                course_sales_map[course.id] = {
+                    "id": course.id,
+                    "course": course.title,
+                    "sales": 0
+                }
+
+        serialized = CourseSalesSerializer(course_sales_map.values(), many=True)
+        return Response(serialized.data)
+
+
+class SixMonthsCourseSales(APIView):
+    permission_classes = []
+    def get(self, request):
+        tenant = request.tenant
+        six_months_ago = datetime.today().replace(day=1) - relativedelta(months=5)
+
+        owned_courses = (
+            OwnedCourse.objects
+            .filter(tenant=tenant, created_at__gte=six_months_ago)
+            .annotate(month=TruncMonth('created_at'))
+            .values("month")
+            .annotate(sales=Count('id'))
+            .order_by("month")
+        )
+
+        result = []
+        current = datetime.today().replace(day=1)
+        for i in range(5, -1, -1):
+            month = current - relativedelta(months=i)
+            label = month.strftime("%b %Y")
+            sales = next(
+                (item['sales'] for item in owned_courses if item['month'].month == month.month and item['month'].year == month.year),
+                0
+            )
+            result.append({
+                "month": label,
+                "sales": sales
+            })
+
+        serializer = TenantSalesAnalyticsSerializer({
+            "tenant": tenant.name,
+            "sales": result
+        })
+
+        return Response(serializer.data)
+    
+
+
+class CourseBoughtAnalytics(APIView):
+    def get(self, request):
+        owned_courses = OwnedCourse.objects.filter(tenant=request.tenant ,).order_by("-created_at")[:20]
+       
+        serializer = OwnedCourseAnalyticalSerializer(owned_courses , many=True)
+        return Response(serializer.data , status=200)

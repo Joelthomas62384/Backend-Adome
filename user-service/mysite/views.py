@@ -16,7 +16,10 @@ from django.db.models import Q
 from .utils import create_user_scope
 from .scope_decorator import user_permission
 from . import constants
-
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from django.db.models.aggregates import Count
+from django.db.models.functions import TruncMonth
 
 
 
@@ -400,3 +403,47 @@ class TenantUserView(APIView):
         except Exception as e:
             print(e)
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+class TotalUsers(APIView):
+    def get(self ,request):
+        data = TenantUsers.objects.filter(tenant=request.tenant).count()
+        serializer = TotalUserSerializer({"total_users" : data})
+        return Response(serializer.data)
+    
+
+from django.utils import timezone
+class UserAnalyticsInSixMonths(APIView):
+    def get(self, request):
+        tenant = request.tenant
+        now = timezone.now().replace(day=1)
+        
+        months = [now - relativedelta(months=i) for i in reversed(range(6))]
+        month_labels = [m.strftime('%b %Y') for m in months]
+
+        six_months_ago = months[0]
+        users = (
+            TenantUsers.objects
+            .filter(tenant=tenant, created_at__gte=six_months_ago)
+            .annotate(month=TruncMonth('created_at'))
+            .values('month')
+            .annotate(joined=Count('id'))
+        )
+        actual_data = {u['month'].strftime('%b %Y'): u['joined'] for u in users}
+
+        data = [
+            {'month': label, 'joined': actual_data.get(label, 0)}
+            for label in month_labels
+        ]
+
+        return Response(data, status=200)
+
+
+
+class GetTenantUsersJoining(APIView):
+    def get(self ,request):
+        model = TenantUsers.objects.filter(tenant=request.tenant).order_by('-created_at')[:20]
+        serializer = TenantUserAnalyticsSerializer(model, many=True)
+        return Response(serializer.data, status=200)
+    
