@@ -286,3 +286,5 @@ class CheckConnectedPayment(APIView):
         tenant_payment = TenantPayments.objects.filter(tenant=request.tenant)
         serializer = CheckPaymentConnect({"connected" : tenant_payment.exists})
         return Response(serializer.data , status=200)
+
+

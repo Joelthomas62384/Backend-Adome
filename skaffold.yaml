@@ -15,7 +15,7 @@ build:
           - src: "!**/consumer.py"
             dest: "/app"
 
-            
+
     - image: joelthomas1103/comment
       context: comment-service
       docker:
@@ -27,7 +27,7 @@ build:
           - src: "!**/consumer.py"
             dest: "/app"
 
-            
+
     - image: joelthomas1103/community
       context: community-service
       docker:
@@ -39,7 +39,7 @@ build:
           - src: "!**/consumer.py"
             dest: "/app"
 
-            
+
     - image: joelthomas1103/course
       context: course-service
       docker:
@@ -51,7 +51,7 @@ build:
           - src: "!**/consumer.py"
             dest: "/app"
 
-            
+
     - image: joelthomas1103/media
       context: media-service
       docker:
@@ -63,7 +63,7 @@ build:
           - src: "!**/consumer.py"
             dest: "/app"
 
-            
+
     - image: joelthomas1103/payment
       context: payment-service
       docker:
@@ -75,7 +75,7 @@ build:
           - src: "!**/consumer.py"
             dest: "/app"
 
-            
+
     - image: joelthomas1103/tenant
       context: tenant-service
       docker:
@@ -87,7 +87,7 @@ build:
           - src: "!**/consumer.py"
             dest: "/app"
 
-            
+
     - image: joelthomas1103/user
       context: user-service
       docker:
@@ -99,7 +99,7 @@ build:
           - src: "!**/consumer.py"
             dest: "/app"
 
-            
+
     - image: joelthomas1103/webbuilder
       context: website-builder
       docker:
@@ -111,7 +111,7 @@ build:
           - src: "!**/consumer.py"
             dest: "/app"
 
-            
+
 manifests:
   rawYaml:
     - ingress-websockets.txt

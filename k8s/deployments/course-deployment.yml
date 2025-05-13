@@ -16,10 +16,15 @@ spec:
         - name: wait-for-rootdb
           image: busybox:1.36
           command: ['sh', '-c', 'until nc -z rootdb 5432; do echo "Waiting for rootdb..."; sleep 2; done']
-
         - name: wait-for-rabbitmq
-          image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo "Waiting for rabbitmq..."; sleep 2; done']
+          image: curlimages/curl:8.5.0
+          command:
+            - sh
+            - -c
+            - >
+              until curl -u root:root -s -o /dev/null -w "%{http_code}" rabbitmq:15672/api/overview | grep -q "200"; 
+              do echo "Waiting for RabbitMQ to be ready..."; sleep 2; done
+
       
       containers:
         - name: course

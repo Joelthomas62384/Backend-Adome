@@ -1,6 +1,7 @@
 from django.db import models
 from cryptography.fernet import Fernet
 from django.conf import settings
+from datetime import datetime,timedelta
 
 
 fernet = Fernet(settings.ENCRYPTION_KEY)
@@ -178,3 +179,64 @@ class Order(models.Model):
 
     def __str__(self):
         return f"{self.user_id} - {self.course_id} - ₹{self.order_amount}"
+
+
+
+
+
+
+
+class Subscription(models.Model):
+    PLAN_CHOICES = (
+        ('1', 'Free'),
+        ('2', 'Premium'),
+    )
+    STATUS_CHOICES = (
+        ('active', 'Active'),
+        ('pending', 'Pending'),
+        ('cancelled', 'Cancelled'),
+        ('grace', 'Grace Period'),
+    )
+    tenant = models.OneToOneField(Tenants, on_delete=models.CASCADE)
+    plan = models.CharField(max_length=10, choices=PLAN_CHOICES, default='1')
+    razorpay_subscription_id = models.CharField(max_length=100, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='inactive')
+    grace_period_end = models.DateTimeField(null=True, blank=True)
+    billing_cycle_end = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def start_grace_period(self):
+        """Start a 2-day grace period."""
+        self.status = 'grace'
+        self.grace_period_end = datetime.now() + timedelta(days=2)
+        self.save()
+
+    def check_grace_period(self):
+        """Check if grace period has expired (7 days total)."""
+        if self.status == 'grace' and self.grace_period_end:
+            if datetime.now() >= self.grace_period_end + timedelta(days=5):  # 2 + 5 = 7 days
+                self.plan = 'FREE'
+                self.status = 'cancelled'
+                self.razorpay_subscription_id = None
+                self.grace_period_end = None
+                self.billing_cycle_end = None
+                self.save()
+                return True
+        return False
+
+    def __str__(self):
+        return f"{self.user.username} - {self.plan}"
+
+
+
+
+
+
+
+
+
+
+
+
+
