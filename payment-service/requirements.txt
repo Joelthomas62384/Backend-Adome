@@ -10,4 +10,4 @@ python-dotenv
 requests
 razorpay
 cryptography
-channels_redis
+python-dateutil

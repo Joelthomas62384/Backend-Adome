@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from app.models import TenantPayments
+from app.models import TenantPayments , Order
 
 
 
@@ -20,3 +20,57 @@ class TenantPaymentSerializer(serializers.ModelSerializer):
         model = TenantPayments
         fields = "__all__"
         read_only_fields = ['id','tenant']
+
+
+    
+
+
+class TenantWallentAnalytics(serializers.Serializer):
+    total_amount = serializers.IntegerField(read_only=True)
+    withdrawal_amount = serializers.IntegerField(read_only=True)
+
+
+
+
+class MonthlyOrderSummarySerializer(serializers.Serializer):
+    month = serializers.CharField()
+    total_amount = serializers.FloatField()
+
+
+class DailyOrderSummarySerializer(serializers.Serializer):
+    date = serializers.CharField()
+    total_amount = serializers.FloatField()
+
+
+
+class OrderAnalyticSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField(read_only=True)
+    course = serializers.SerializerMethodField(read_only=True)
+    profile_pic = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ['user' , 'id' , 'order_amount' , 'course' ,'order_date' , 'profile_pic']
+
+    def get_user(self , obj):
+        try:
+            return obj.user.user.full_name
+        except:
+            return None
+    def get_profile_pic(self , obj):
+            try:
+                return obj.user.user.profile_pic
+            except:
+                return None
+
+
+    def get_course(self, obj):
+        try:
+            return obj.course.title
+        except :
+            return None
+        
+    
+
+class CheckPaymentConnect(serializers.Serializer):
+    connected = serializers.BooleanField()

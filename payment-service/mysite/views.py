@@ -8,6 +8,11 @@ from django.conf import settings
 from razorpay.errors import BadRequestError, ServerError
 from app.serializers import OrderSerializer
 from app.producers import Publisher
+from django.db import transaction
+from django.db.models.aggregates import Sum
+from django.db.models.functions import TruncMonth , TruncDate
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
 
 
 
@@ -38,7 +43,7 @@ class PaymentGatewayRegister(APIView):
                     'name': name,
                     'phone': phone,
                     'bank_account_number': bank_account_number,
-                    'bank_ifsc_code': bank_ifsc_code,
+                    'bank_ifsc': bank_ifsc_code,
                     'pan_number': pan_number,
                     'encrypted_email': encrypted_email,
                 }
@@ -55,6 +60,7 @@ class PaymentGatewayRegister(APIView):
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
+            print(e)
             return Response({'error': f'Unexpected error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # user_id = models.CharField(max_length=100)
@@ -115,6 +121,7 @@ class CreateCourseOrderView(APIView):
 
 
 class VerifyPayment(APIView):
+    @transaction.atomic
     def post(self ,request):
         data = request.data
 
@@ -151,3 +158,131 @@ class VerifyPayment(APIView):
 
         except razorpay.errors.SignatureVerificationError:
             return Response({"success": False, "error": "Invalid signature"}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+from datetime import timedelta , datetime
+class WalletDetailsInAnalytics(APIView):
+
+    """
+    
+class TenantWallet(models.Model):
+    tenant = models.OneToOneField(Tenants , on_delete=models.CASCADE)
+    total_amount = models.DecimalField(default=0 , decimal_places=2, max_digits=10)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+
+    def __str__(self):
+        return self.tenant.name
+    
+
+
+
+class Order(models.Model):
+    user = models.ForeignKey(TenantUsers , on_delete=models.CASCADE , null=True ,blank=True)
+    course = models.ForeignKey(CourseCache, on_delete=models.CASCADE)
+    tenant = models.ForeignKey(Tenants, on_delete=models.CASCADE , null=True , blank=True)
+    course_title = models.CharField(max_length=255)
+    order_product = models.CharField(max_length=100)
+    order_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=10, default="INR")
+    razorpay_order_id = models.CharField(max_length=100, unique=True)
+    order_payment_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    order_signature = models.CharField(max_length=256, blank=True, null=True)
+    is_paid = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
+    order_status = models.CharField(max_length=20, default="created")
+    payment_method = models.CharField(max_length=50, blank=True, null=True)
+    payment_time = models.DateTimeField(blank=True, null=True)
+    order_date = models.DateTimeField(auto_now_add=True)
+
+    """
+    def get(self ,request):
+        wallet = TenantWallet.objects.get(tenant=request.tenant)
+        seven_days_ago = timezone.now() - timedelta(days=7)
+        seven_days_after_total = (
+            Order.objects
+            .filter(tenant=request.tenant , order_date__gte=seven_days_ago , is_paid=True)
+            .aggregate(total_amount=Sum('order_amount'))
+        )['total_amount'] or 0
+        serializer = TenantWallentAnalytics({"total_amount" : wallet.total_amount , "withdrawal_amount" : wallet.total_amount-seven_days_after_total})
+        return Response(serializer.data , status=200)
+
+
+
+class TotalOrdersWeGotInSixMonths(APIView):
+    def get(self, request):
+        today = timezone.now().replace(day=1) 
+        six_months = [today - relativedelta(months=i) for i in reversed(range(6))]
+
+        queryset = (
+            Order.objects.filter(is_paid=True, order_date__gte=six_months[0])
+            .annotate(month=TruncMonth("order_date"))
+            .values("month")
+            .annotate(total_amount=Sum("order_amount"))
+        )
+
+        amount_by_month = {
+            item["month"].strftime("%b %Y"): float(item["total_amount"] or 0)
+            for item in queryset
+        }
+
+        # Build complete 6-month data
+        final_data = []
+        for date in six_months:
+            label = date.strftime("%b %Y")
+            total = amount_by_month.get(label, 0)
+            final_data.append({"month": label, "total_amount": total})
+
+        serializer = MonthlyOrderSummarySerializer(final_data, many=True)
+        return Response(serializer.data)
+
+
+
+
+class TotalOrdersWeGotInSevenDays(APIView):
+    def get(self, request):
+        today = timezone.now().date()
+        start_date = today - timedelta(days=6)
+        date_range = [start_date + timedelta(days=i) for i in range(7)]
+
+        queryset = (
+            Order.objects.filter(is_paid=True, order_date__date__gte=start_date)
+            .annotate(date=TruncDate("order_date"))
+            .values("date")
+            .annotate(total_amount=Sum("order_amount"))
+        )
+
+        amount_by_date = {
+            item["date"]: float(item["total_amount"] or 0)
+            for item in queryset
+        }
+
+        final_data = [
+            {
+                "date": date.strftime("%a %d %b"),
+                "total_amount": amount_by_date.get(date, 0)
+            }
+            for date in date_range
+        ]
+
+        serializer = DailyOrderSummarySerializer(final_data, many=True)
+        return Response(serializer.data)
+    
+
+
+class PreviousOrderLogs(APIView):
+    def get(self ,request):
+        order = Order.objects.filter(tenant=request.tenant, is_paid=True).order_by('-id')[:12]
+        serializer= OrderAnalyticSerializer(order, many=True)
+        print(serializer.data)
+        return Response(serializer.data , status=200)
+    
+
+
+class CheckConnectedPayment(APIView):
+    def get(self, request):
+        tenant_payment = TenantPayments.objects.filter(tenant=request.tenant)
+        serializer = CheckPaymentConnect({"connected" : tenant_payment.exists})
+        return Response(serializer.data , status=200)

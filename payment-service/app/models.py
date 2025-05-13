@@ -58,7 +58,7 @@ class TenantPayments(models.Model):
     encrypted_bank_account_number = models.TextField(null=True, blank=True)
     encrypted_bank_ifsc = models.TextField(null=True, blank=True)
     encrypted_pan_number = models.TextField(null=True, blank=True)
-    encrypted_phone_number = models.CharField(max_length=20 , null=True , blank=True)
+    encrypted_phone_number = models.CharField(max_length=100 , null=True , blank=True)
 
     def __str__(self):
         return self.tenant.name
@@ -171,7 +171,7 @@ class Order(models.Model):
     is_verified = models.BooleanField(default=False)
     order_status = models.CharField(max_length=20, default="created")
     payment_method = models.CharField(max_length=50, blank=True, null=True)
-    payment_time = models.DateTimeField(blank=True, null=True)
+    payment_time = models.DateTimeField(blank=True, null=True , auto_now=True)
     order_date = models.DateTimeField(auto_now_add=True)
 
 
