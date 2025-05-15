@@ -9,7 +9,7 @@ django.setup()
 import pika 
 import json
 import logging
-from  consume_utils import  user_callback
+from  consume_utils import  user_callback , subscription_callback
 
 
 
@@ -34,7 +34,10 @@ def callback(ch, method, properties, body):
     
     if contenttype == 'user':
         user_callback(ch , event_type , data , method)
+    elif contenttype == 'subscription':
+        subscription_callback(ch , event_type , data , method)
         logging.info('user callback done')
+        pass
     else:
         logging.warning(f"Unhandled content type: {contenttype}")
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)

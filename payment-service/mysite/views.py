@@ -5,7 +5,6 @@ from app.models import *
 from .serializers import *
 import razorpay
 from django.conf import settings
-from razorpay.errors import BadRequestError, ServerError
 from app.serializers import OrderSerializer
 from app.producers import Publisher
 from django.db import transaction
@@ -17,7 +16,6 @@ from dateutil.relativedelta import relativedelta
 
 
 
-razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
 
 class PaymentGatewayRegister(APIView):
@@ -86,6 +84,7 @@ class CreateCourseOrderView(APIView):
         course_id = data.get("course_id")
         course = CourseCache.objects.get(id=course_id)
         amount = course.price
+        razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
         if not all([course_id , amount]):
             return Response({"error": "Missing fields"}, status=400)
@@ -120,15 +119,18 @@ class CreateCourseOrderView(APIView):
     
 
 
-class VerifyPayment(APIView):
+class VerifyPaymentCourse(APIView):
     @transaction.atomic
     def post(self ,request):
         data = request.data
+        razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
 
         razorpay_order_id = data.get("razorpay_order_id")
         razorpay_payment_id = data.get("razorpay_payment_id")
         razorpay_signature = data.get("razorpay_signature")
 
+        print("VerifyPayment payload:", data)
         try : 
             razorpay_client.utility.verify_payment_signature({
                 "razorpay_order_id": razorpay_order_id,
@@ -158,6 +160,8 @@ class VerifyPayment(APIView):
 
         except razorpay.errors.SignatureVerificationError:
             return Response({"success": False, "error": "Invalid signature"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error' : str(e)})
         
 
 

@@ -1,5 +1,5 @@
 import logging
-from app.models import UserCache as Users
+from app.models import UserCache as Users , Tenants
 
 logger = logging.getLogger(__name__)
 
@@ -52,3 +52,29 @@ def user_callback(ch, event_type, data, method):
     except Exception as e:
         logger.error(f"Processing error: {e}", exc_info=True)
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True) 
+
+
+
+def subscription_callback(ch, event_type, data, method):
+    try:
+        if not isinstance(data, dict):
+            logger.error(f"Invalid data type received: {type(data)} - {data}")
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)  
+            return
+        tenant = Tenants.objects.filter(id=data['id'])
+        if not tenant.exists():
+            logger.error(f"Invalid data type received: {type(data)} - {data}")
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)  
+            return
+        tenant = tenant.first()
+        tenant.subscription_plan = data['plan']
+        tenant.save()
+
+
+
+
+
+    except Exception as e:
+        logger.error(f"Processing error: {e}", exc_info=True)
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True) 
+

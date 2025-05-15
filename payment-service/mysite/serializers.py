@@ -74,3 +74,16 @@ class OrderAnalyticSerializer(serializers.ModelSerializer):
 
 class CheckPaymentConnect(serializers.Serializer):
     connected = serializers.BooleanField()
+
+
+
+class SubscriptionSerializer(serializers.Serializer):
+    plan = serializers.CharField()
+    message = serializers.CharField()
+    subscription_id = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    razorpay_key = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
+
+
+class SuccessSerializer(serializers.Serializer):
+    message = serializers.CharField()
