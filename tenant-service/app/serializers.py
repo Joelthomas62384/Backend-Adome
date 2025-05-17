@@ -10,7 +10,7 @@ class TenantSerializer(serializers.ModelSerializer):
         model = Tenants
         fields = [
 
-           'id' ,'name', 'domain', 'contact_email', 
+           'id' ,'name',  'contact_email', 
             'location', 'description', 'blog', 'community', 'newsletter'  , 'admin' , 'subscription_plan' , 'courses', 'subdomain' , 'contact_email' , 'logo'
         ]
         read_only_fields = ['id']

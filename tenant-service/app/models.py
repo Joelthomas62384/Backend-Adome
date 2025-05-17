@@ -25,7 +25,6 @@ class Tenants(models.Model):
     name = models.CharField(max_length=100,unique=True)
     subscription_plan = models.CharField(choices=sub_choices , max_length=100 , default="1")
     logo = models.TextField(null=True,blank=True)
-    domain = models.CharField(max_length=250,null=True)
     contact_email = models.EmailField(null=True,blank=True)
     location = models.CharField(max_length=100 , blank=True, null=True)
     description = models.TextField(null=True, blank=True)
@@ -45,5 +44,14 @@ class Tenants(models.Model):
     def __str__(self):
         return self.name
     
+
+
+
+class Domain(models.Model):
+    tenant = models.ForeignKey(Tenants, on_delete=models.CASCADE ,related_name='tenant_domains_model')
+    domain = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.tenant.name + ' - ' + self.domain
 
 

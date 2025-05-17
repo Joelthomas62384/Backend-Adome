@@ -15,6 +15,8 @@ class TenantMiddleware(MiddlewareMixin):
         tenant = Tenants.objects.filter(subdomain=tenant_subdomain).first()
         if not tenant:
             return JsonResponse({'error': 'Invalid tenant'}, status=404)
+        if tenant.subscription_plan == '1':
+            return JsonResponse({'error': 'Access denied: Free plan is not allowed for this request'}, status=400)
 
         request.tenant = tenant
         request.path_info = "/" + "/".join(newpath) 

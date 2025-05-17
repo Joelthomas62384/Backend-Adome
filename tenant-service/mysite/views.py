@@ -28,8 +28,14 @@ class TenantView(APIView):
         if tenant.exists():
             return Response({'error': 'You already have a tenant'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = TenantSerializer(data=request.data, context={'request': request})
+        print(request.data)
         if serializer.is_valid():
-            serializer.save(admin=request.user)
+            frontend = f"{request.data.get('subdomain')}.localhost:3000"
+            print(frontend)
+            tenant_instance = serializer.save(admin=request.user)
+            Domain.objects.create(tenant=tenant_instance , domain=frontend)
+            # return Response( status=status.HTTP_201_CREATED)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -56,4 +62,21 @@ class MetadataView(APIView):
         return Response(serializer.data , status=status.HTTP_200_OK)
 
 
+
+
+
+
+class GetTenantSchema(APIView):
+    permission_classes = []
+    authentication_classes = []
+
+    def post(self, request):
+        data = request.data
+        print(data)
+        domain = data.get('domain')
+        domain = Domain.objects.filter(domain=domain)
+        if domain.exists():
+            domain = domain.first()
+            return Response({'schemaName' : domain.tenant.subdomain},status=200)
+        return Response(status=400)
 

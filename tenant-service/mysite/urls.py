@@ -8,6 +8,7 @@ urlpatterns = [
     path('tenant' , TenantView.as_view()),
     path('tenant/<subdomain>' , TenantView.as_view()),
     path('metadata' , MetadataView.as_view()),
+    path('get-schema' ,GetTenantSchema.as_view())
     
 ]
 

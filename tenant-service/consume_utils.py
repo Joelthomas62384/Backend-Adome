@@ -61,7 +61,7 @@ def subscription_callback(ch, event_type, data, method):
             logger.error(f"Invalid data type received: {type(data)} - {data}")
             ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)  
             return
-        tenant = Tenants.objects.filter(id=data['id'])
+        tenant = Tenants.objects.filter(id=data['tenant'])
         if not tenant.exists():
             logger.error(f"Invalid data type received: {type(data)} - {data}")
             ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)  
@@ -69,7 +69,7 @@ def subscription_callback(ch, event_type, data, method):
         tenant = tenant.first()
         tenant.subscription_plan = data['plan']
         tenant.save()
-
+        ch.basic_ack(delivery_tag=method.delivery_tag)  
 
 
 

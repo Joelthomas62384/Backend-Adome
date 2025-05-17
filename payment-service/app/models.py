@@ -226,7 +226,7 @@ class Subscription(models.Model):
         return False
 
     def __str__(self):
-        return f"{self.user.username} - {self.plan}"
+        return f"{self.tenant.name} - {self.plan}"
 
 
 

@@ -4,6 +4,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.db import close_old_connections
 from app.models import Tenants, TenantUsers, UserCache
+from asgiref.sync import sync_to_async
 
 class AuthenticationMiddleware:
     def __init__(self, app):
@@ -27,6 +28,7 @@ class AuthenticationMiddleware:
                 userscope = token['scope']
 
                 tenant_obj = await self.get_tenant(tenant)
+                
                 user = await self.get_user(user_id)
                 
                 if user is None or not user.is_active:  

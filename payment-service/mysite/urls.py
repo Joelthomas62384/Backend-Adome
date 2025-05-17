@@ -21,7 +21,10 @@ urlpatterns = [
 
     path('create-subscription', SubscriptionCreateView.as_view()),
     path('verify-subscription' , VerifyPayment.as_view()),
-    path('cancel-subscription' , CancelPayment.as_view()),
+    path('cancel-subscription' , CancelSubscription.as_view()),
+
+
+    # webhook
     path('webhook', webhook , name='webhook')
 
 

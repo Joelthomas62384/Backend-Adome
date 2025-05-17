@@ -5,9 +5,9 @@ psycopg2
 pika
 pillow
 django-cors-headers
-django-tenants
 python-dotenv
 requests
 python-dotenv
 faker
 python-dateutil
+gunicorn

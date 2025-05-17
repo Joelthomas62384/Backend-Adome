@@ -20,6 +20,13 @@ def create_tenant_wallet(sender, instance, created, **kwargs):
 
 @receiver(post_save,sender=Subscription)
 def update_tenant_subscription(sender , instance, created , **kwargs):
-    plan_type = instance.plan_type
+    plan_type = instance.plan
     tenant = instance.tenant
-    Publisher({'plan' : plan_type , 'tenant' : tenant.id} , 'subscription' , 'updated')
+    if plan_type == '2' :
+        if instance.status in ['active' , 'grace']:
+
+    
+            Publisher({'plan' : plan_type , 'tenant' : tenant.id} , 'subscription' , 'updated')
+    else:
+            Publisher({'plan' : plan_type , 'tenant' : tenant.id} , 'subscription' , 'updated')
+

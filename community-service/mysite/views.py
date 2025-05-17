@@ -13,6 +13,7 @@ class Pagination(PageNumberPagination):
 
 
 
+
 class GetCommunities(APIView):
     @user_permission(HAS_COMMUNITY_PERMISSION)
     def get(self, request):
