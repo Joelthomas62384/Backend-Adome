@@ -27,10 +27,12 @@ spec:
         - containerPort: 15672
           name: http
         readinessProbe:
-          exec:
-            command: ["rabbitmq-diagnostics", "status"]
-          initialDelaySeconds: 10
-          periodSeconds: 5
+            exec:
+              command: ["rabbitmq-diagnostics", "status"]
+            initialDelaySeconds: 20      
+            periodSeconds: 10           
+            timeoutSeconds: 5           
+            failureThreshold: 10         
       volumes:
         - name: rabbitmq-storage
           persistentVolumeClaim:

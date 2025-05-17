@@ -11,6 +11,7 @@ def user_permission(required_permission):
             print(scope)
 
             if not scope:
+                
                 return Response({'detail': 'Unauthorized: Missing scope.'}, status=status.HTTP_401_UNAUTHORIZED)
 
             if scope.get('is_admin') or (scope.get('is_staff') and scope.get(required_permission)):

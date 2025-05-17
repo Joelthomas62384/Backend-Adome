@@ -220,6 +220,7 @@ class RefreshTokenView(APIView):
     def post(self, request):
         token = request.COOKIES.get('refresh_token')
         old_access_token = request.COOKIES.get('access_token')
+        print(token , old_access_token)
 
         if not token or not old_access_token:
             return Response({'error': 'Tokens missing'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -254,6 +255,7 @@ class RefreshTokenView(APIView):
             return response
 
         except Exception as e:
+            print(e)
             response = Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
             response.delete_cookie('refresh_token', domain='.localhost')
             response.delete_cookie('access_token', domain='.localhost')
@@ -294,6 +296,7 @@ class LogoutView(APIView):
 class GetTenantUsersView(APIView):
     @user_permission(constants.HAS_STAFF_PERMISSION)
     def get(self, request):
+        print(request.scope)
         try:
             paginator = PageNumberPagination()
             paginator.page_size = 12
@@ -318,6 +321,7 @@ class GetTenantUsersView(APIView):
 class GetTenantUserView(APIView):
     
     def get(self, request):
+        print(request.tenantuser    )
         try:
             print(request.user)
             print(request.tenantuser)
