@@ -25,6 +25,8 @@ spec:
               until curl -u root:root -s -o /dev/null -w "%{http_code}" rabbitmq:15672/api/overview | grep -q "200"; 
               do echo "Waiting for RabbitMQ to be ready..."; sleep 2; done
 
+
+
         
       containers:
         - name: blog
