@@ -28,7 +28,7 @@ spec:
         
       containers:
         - name: blog
-          image: joelthomas1103/blog:latest 
+          image: joelthomas1103/adome-blog:latest 
           ports:
             - containerPort: 8000  
           env:

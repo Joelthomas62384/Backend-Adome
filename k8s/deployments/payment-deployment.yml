@@ -27,7 +27,7 @@ spec:
 
       containers:
         - name: payment
-          image: joelthomas1103/payment:latest 
+          image: joelthomas1103/adome-payment:latest 
           ports:
             - containerPort: 8000  
           env:

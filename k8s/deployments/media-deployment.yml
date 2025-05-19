@@ -28,7 +28,7 @@ spec:
       
       containers:
         - name: media
-          image: joelthomas1103/media:latest 
+          image: joelthomas1103/adome-media:latest 
           ports:
             - containerPort: 8000  
           env:

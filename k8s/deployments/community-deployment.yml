@@ -31,7 +31,7 @@ spec:
 
       containers:
         - name: community
-          image: joelthomas1103/community:latest 
+          image: joelthomas1103/adome-community:latest 
           ports:
             - containerPort: 8000  
           env:

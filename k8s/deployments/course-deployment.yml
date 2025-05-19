@@ -28,7 +28,7 @@ spec:
       
       containers:
         - name: course
-          image: joelthomas1103/course:latest 
+          image: joelthomas1103/adome-course:latest 
           ports:
             - containerPort: 8000  
           env:

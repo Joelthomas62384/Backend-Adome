@@ -28,7 +28,7 @@ spec:
       
       containers:
         - name: comment
-          image: joelthomas1103/comment:latest 
+          image: joelthomas1103/adome-comment:latest 
           ports:
             - containerPort: 8000  
           env:

@@ -29,7 +29,7 @@ spec:
        
       containers:
         - name: webbuilder
-          image: joelthomas1103/webbuilder:latest 
+          image: joelthomas1103/adome-webbuilder:latest 
           ports:
             - containerPort: 8000  
           env:

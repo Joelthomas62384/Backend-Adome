@@ -27,7 +27,7 @@ spec:
 
       containers:
         - name: user
-          image: joelthomas1103/user:latest 
+          image: joelthomas1103/adome-user:latest 
           ports:
             - containerPort: 8000  
           env:
