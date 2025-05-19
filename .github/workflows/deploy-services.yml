@@ -1,0 +1,110 @@
+name: deploy-services
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "blog-service/**"
+      - "comment-service/**"
+      - "community-service/**"
+      - "course-service/**"
+      - "media-service/**"
+      - "payment-service/**"
+      - "tenant-service/**"
+      - "user-service/**"
+      - "website-service/**"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - uses: actions/checkout@v4
+
+      # Set up Docker Buildx for ARM64 builds
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Create .env file for user-service
+      - name: Create .env file for user-service
+        run: |
+          if [[ "${{ github.event.head_commit.message }}" =~ "user-service" || $(git diff --name-only HEAD^ HEAD | grep -c "^user-service/") -gt 0 ]]; then
+            echo "Creating .env for user-service"
+            echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" > user-service/.env
+            echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> user-service/.env
+            echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> user-service/.env
+          fi
+
+      # Build and push Docker images for changed services
+      - name: Build and Push Docker Images
+        run: |
+          services=(
+            "blog-service"
+            "comment-service"
+            "community-service"
+            "course-service"
+            "media-service"
+            "payment-service"
+            "tenant-service"
+            "user-service"
+            "website-service"
+          )
+          for service in "${services[@]}"; do
+            if [[ "${{ github.event.head_commit.message }}" =~ "$service" || $(git diff --name-only HEAD^ HEAD | grep -c "^$service/") -gt 0 ]]; then
+              echo "Building and pushing $service"
+              docker buildx build --platform linux/arm64 \
+                -t ${{ secrets.DOCKER_USERNAME }}/adome-$service:${{ github.sha }} \
+                -t ${{ secrets.DOCKER_USERNAME }}/adome-$service:latest \
+                --push \
+                $service/
+              echo "Applying deployment for $service"
+              kubectl apply -f k8s/deployments/$service-deployment.yml
+            fi
+          done
+        env:
+          KUBECONFIG: $GITHUB_WORKSPACE/kubeconfig.yaml
+
+      # Install kubectl
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      # Set up kubeconfig for K3s cluster
+      - name: Set up kubeconfig
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig.yaml
+          export KUBECONFIG=$GITHUB_WORKSPACE/kubeconfig.yaml
+          kubectl get nodes # Verify cluster access
+
+      # Restart deployments for changed services
+      - name: Restart deployments
+        run: |
+          services=(
+            "blog-service"
+            "comment-service"
+            "community-service"
+            "course-service"
+            "media-service"
+            "payment-service"
+            "tenant-service"
+            "user-service"
+            "website-service"
+          )
+          for service in "${services[@]}"; do
+            if [[ "${{ github.event.head_commit.message }}" =~ "$service" || $(git diff --name-only HEAD^ HEAD | grep -c "^$service/") -gt 0 ]]; then
+              echo "Restarting $service deployment"
+              kubectl rollout restart deployment $service -n default
+            fi
+          done
+        env:
+          KUBECONFIG: $GITHUB_WORKSPACE/kubeconfig.yaml

@@ -32,13 +32,13 @@ class LoginDataView(APIView):
         serializer = LoginSerializer(data =data)
         if serializer.is_valid():
 
-            print(serializer.data)
+            # print(serializer.data)
             data = serializer.validated_data
             username = data.get('username')
             password = data.get('password')
             user = authenticate(username=username, password=password)
             if user is None:
-                print("error here")
+                # print("error here")
                 return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
             tokens = create_user_scope(user , request)
             refresh = tokens['refresh']
@@ -47,11 +47,11 @@ class LoginDataView(APIView):
             expiration_timestamp = access_token['exp']
 
             response = Response( status=status.HTTP_200_OK)
-            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None", domain='.localhost' , secure=True)
+            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True)
             response.set_cookie(key='access_token',  value = str(access_token), secure=True , httponly=True , samesite= "None")
-            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None", domain='.localhost')
+            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
             return response
-        print(serializer.errors)
+        # print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -84,8 +84,8 @@ class LoginView(APIView):
             'access_type':'offline',
             # "prompt":"select_account"
         }
-        # print(redirect_uri)
-        # print(google_client_id)
+        # # print(redirect_uri)
+        # # print(google_client_id)
         user_email = request.COOKIES.get('user_email')
         if user_email:
             params["login_hint"] = user_email
@@ -99,22 +99,22 @@ class LoginView(APIView):
 
 
     def post(self,request, *args,**kwargs):
-        print(request.path_info)
+        # print(request.path_info)
         try:
             code = request.data.get('code')
             state = request.data.get('state')
             error = request.data.get('error')
             if request.user.is_authenticated:
                 return Response({"app" : request.tenant.subdomain})
-            # print(code , state)
+            # # print(code , state)
             if error:
-                print("error")
+                # print("error")
                 return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
             frontend = dotenv_values(".env")["FRONTEND_URL"]
             redirect_uri = f"{frontend}/auth/callback"
-            print(redirect_uri)
+            # print(redirect_uri)
             if error or not state :
-                print("error or not state")
+                # print("error or not state")
                 return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
             token_url = "https://oauth2.googleapis.com/token"
             env = dotenv_values(".env")
@@ -126,8 +126,8 @@ class LoginView(APIView):
                 "redirect_uri": redirect_uri,
                 "grant_type": "authorization_code"
             }
-            print(code)
-            print(error)
+            # print(code)
+            # print(error)
             if error:
                 return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
             token_response = requests.post(token_url,data=token_data)
@@ -142,15 +142,15 @@ class LoginView(APIView):
             user_info_params ={"access_token":access_token}
             user_info_response = requests.get(user_info_url,params=user_info_params)
             user_info = user_info_response.json()
-            print(user_info)
+            # print(user_info)
             if user_info.get('error'):
                 return Response({'error': 'Error'}, status=status.HTTP_400_BAD_REQUEST)
 
 
             email = str(user_info.get('email'))
             full_name = user_info.get('name')
-            print(email)
             # print(email)
+            # # print(email)
             picture = user_info.get('picture')
             
             username = email.split('@')[0]
@@ -164,12 +164,12 @@ class LoginView(APIView):
                 "profile_pic": picture
 
             })
-            print(user , created)
+            # print(user , created)
             if created:
                 user.set_unusable_password()
                 user.save()
 
-            print(user, " is user ")
+            # print(user, " is user ")
             if user is None:
                 return Response({'error': 'Error logging in try again'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -192,7 +192,7 @@ class LoginView(APIView):
 
 
 
-            # print(app)
+            # # print(app)
             tokens = create_user_scope(user , request)
             refresh = tokens['refresh']
             access_token = tokens['access']
@@ -200,17 +200,17 @@ class LoginView(APIView):
             
 
             response = Response({'app':app.subdomain if app else "public" ,'refresh' : str(refresh) , 'access' :str(access_token) , 'expiry' : expiration_timestamp}, status=status.HTTP_200_OK)
-            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None", domain='.localhost' , secure=True)
+            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True)
             response.set_cookie(key='access_token',  value = str(access_token), secure=True , httponly=True , samesite= "None")
-            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None", domain='.localhost')
-            response.set_cookie(key='user_email', value=user.email, secure=True, httponly=True, samesite="None", domain='.localhost')
-            print("cookies are set")
+            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
+            response.set_cookie(key='user_email', value=user.email, secure=True, httponly=True, samesite="None")
+            # print("cookies are set")
             return response
         except requests.exceptions.RequestException as e:
-            print(e)
+            # print(e)
             return Response({'error': f'External request error: {str(e)}'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            print(e)
+            # print(e)
             return Response({'error': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RefreshTokenView(APIView):
@@ -220,7 +220,7 @@ class RefreshTokenView(APIView):
     def post(self, request):
         token = request.COOKIES.get('refresh_token')
         old_access_token = request.COOKIES.get('access_token')
-        print(token , old_access_token)
+        # print(token , old_access_token)
 
         if not token or not old_access_token:
             return Response({'error': 'Tokens missing'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -248,18 +248,18 @@ class RefreshTokenView(APIView):
                 'expiry': expiration_timestamp
             }, status=status.HTTP_200_OK)
 
-            response.set_cookie(key='refresh_token', value=str(refresh), secure=True, httponly=True, samesite="None", domain='.localhost')
-            response.set_cookie(key='access_token', value=str(access_token), secure=True, httponly=True, samesite="None", domain='.localhost')
-            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None", domain='.localhost')
+            response.set_cookie(key='refresh_token', value=str(refresh), secure=True, httponly=True, samesite="None")
+            response.set_cookie(key='access_token', value=str(access_token), secure=True, httponly=True, samesite="None")
+            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
 
             return response
 
         except Exception as e:
-            print(e)
+            # print(e)
             response = Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-            response.delete_cookie('refresh_token', domain='.localhost')
-            response.delete_cookie('access_token', domain='.localhost')
-            response.delete_cookie('expiry', domain='.localhost')
+            response.delete_cookie('refresh_token')
+            response.delete_cookie('access_token')
+            response.delete_cookie('expiry')
             return response
 
     
@@ -274,8 +274,8 @@ class GetUserView(APIView):
 
 
         if request.user.is_authenticated:
-            print(f"User: {request.user}")
-            print(f"Is Authenticated: {request.user.is_authenticated}")
+            # # print(f"User: {request.user}")
+            # # print(f"Is Authenticated: {request.user.is_authenticated}")
 
             user = request.user
             serializer = UserSerializer(user)
@@ -296,7 +296,7 @@ class LogoutView(APIView):
 class GetTenantUsersView(APIView):
     @user_permission(constants.HAS_STAFF_PERMISSION)
     def get(self, request):
-        print(request.scope)
+        # print(request.scope)
         try:
             paginator = PageNumberPagination()
             paginator.page_size = 12
@@ -313,7 +313,7 @@ class GetTenantUsersView(APIView):
 
             serializer = TenantUsersSerializer(paged_data, many=True)
             return paginator.get_paginated_response(serializer.data)
-            # print(serializer.data)
+            # # print(serializer.data)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
@@ -321,17 +321,17 @@ class GetTenantUsersView(APIView):
 class GetTenantUserView(APIView):
     
     def get(self, request):
-        print(request.tenantuser    )
+        # print(request.tenantuser    )
         try:
-            print(request.user)
-            print(request.tenantuser)
+            # print(request.user)
+            # print(request.tenantuser)
             user = request.tenantuser
-            print(user)
+            # print(user)
             serializer = TenantUsersSerializer(user, context={'request':request})
-            print(serializer.data)
+            # print(serializer.data)
             return Response(serializer.data , status=status.HTTP_200_OK)
         except Exception as e:
-            print(e)
+            # print(e)
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
@@ -340,7 +340,7 @@ class BanUserView(APIView):
 
     def post(self, request , username):
         try:
-            print("Ban user")
+            # print("Ban user")
             if not(request.tenantuser.is_admin or request.tenantuser.hasStaffPermission):
 
                 return Response({'data':"Unauthorized access"} , status=status.HTTP_401_UNAUTHORIZED)
@@ -392,7 +392,7 @@ class TenantUserView(APIView):
     
     def patch(self ,request, username):
         try:
-            print(request.data)
+            # print(request.data)
             user = User.objects.get(username=username)
             tenantuser = TenantUsers.objects.get(user=user, tenant=request.tenant)
             serializer = TenantUsersSerializer(tenantuser, data=request.data, partial=True)
@@ -400,12 +400,12 @@ class TenantUserView(APIView):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
-                print(serializer.errors)
+                # print(serializer.errors)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            print(e)
+            # print(e)
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 

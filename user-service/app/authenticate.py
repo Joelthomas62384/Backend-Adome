@@ -29,6 +29,7 @@ class CustomJwtAuthentication(JWTAuthentication):
         # if request.tenant == 
         access = AccessToken(raw_token)
         if access['tenant'] != tenant.subdomain :
+            print('token checking error')
             return None
         # print(f"tenant is {tenant}")
         request.scope = access['scope']

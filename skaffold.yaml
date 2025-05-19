@@ -114,7 +114,7 @@ build:
 
 manifests:
   rawYaml:
-    - ingress-websockets.txt
+    - k8s/secrets/secret.yml
     - k8s/postgres-init-configmap.yml
     - k8s/deployments/blog-deplment.yml
     - k8s/deployments/comments-deployment.yml
@@ -129,4 +129,3 @@ manifests:
     - k8s/deployments/user-deployment.yml
     - k8s/deployments/webbuilder-deployment.yml
     - k8s/ingress/ingress.yml
-    - k8s/secrets/secret.yml
