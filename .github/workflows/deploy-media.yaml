@@ -34,4 +34,4 @@ jobs:
           project_id: adome-ms
       - name: Restart media deployment to pull new image
         run: |
-          kubectl rollout restart deployment media-deployment
+          kubectl rollout restart deployment media

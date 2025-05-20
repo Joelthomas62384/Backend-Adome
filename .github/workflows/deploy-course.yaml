@@ -34,4 +34,4 @@ jobs:
           project_id: adome-ms
       - name: Restart course deployment to pull new image
         run: |
-          kubectl rollout restart deployment course-deployment
+          kubectl rollout restart deployment course

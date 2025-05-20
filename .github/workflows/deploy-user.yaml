@@ -34,4 +34,4 @@ jobs:
           project_id: adome-ms
       - name: Restart user deployment to pull new image
         run: |
-          kubectl rollout restart deployment user-deployment
+          kubectl rollout restart deployment user

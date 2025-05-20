@@ -34,4 +34,4 @@ jobs:
           project_id: adome-ms
       - name: Restart payment deployment to pull new image
         run: |
-          kubectl rollout restart deployment payment-deployment
+          kubectl rollout restart deployment payment

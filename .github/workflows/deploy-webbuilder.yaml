@@ -34,4 +34,4 @@ jobs:
           project_id: adome-ms
       - name: Restart webbuilder deployment to pull new image
         run: |
-          kubectl rollout restart deployment webbuilder-deployment
+          kubectl rollout restart deployment webbuilder

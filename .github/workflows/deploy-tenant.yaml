@@ -34,4 +34,4 @@ jobs:
           project_id: adome-ms
       - name: Restart tenant deployment to pull new image
         run: |
-          kubectl rollout restart deployment tenant-deployment
+          kubectl rollout restart deployment tenant

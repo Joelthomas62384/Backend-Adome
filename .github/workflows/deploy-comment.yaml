@@ -34,4 +34,4 @@ jobs:
           project_id: adome-ms
       - name: Restart comment deployment to pull new image
         run: |
-          kubectl rollout restart deployment comment-deployment
+          kubectl rollout restart deployment comment
