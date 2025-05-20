@@ -29,6 +29,9 @@ spec:
               do echo "Waiting for RabbitMQ to be ready..."; sleep 2; done
 
       
+
+
+      
       containers:
         - name: comment
           image: joelthomas1103/adome-comment:latest 
