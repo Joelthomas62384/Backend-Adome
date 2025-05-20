@@ -25,7 +25,8 @@ SECRET_KEY = os.getenv('SECRET_KEY','asdfasdfasdf')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["https://adome.codewithjoe.in" , "adome.codewithjoe.in"]
+
 
 
 # Application definition
