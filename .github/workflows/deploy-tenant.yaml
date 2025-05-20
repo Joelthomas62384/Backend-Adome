@@ -2,11 +2,12 @@ name: deploy-tenant
 on:
   push:
     branches: [main]
-    paths:
-      - 'tenant-service/**'
+    # paths:
+    #   - 'tenant-service/**'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: adome
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx

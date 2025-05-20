@@ -2,11 +2,12 @@ name: deploy-webbuilder
 on:
   push:
     branches: [main]
-    paths:
-      - 'webbuilder-service/**'
+    # paths:
+    #   - 'website-builder/**'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: adome
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx

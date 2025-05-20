@@ -2,11 +2,12 @@ name: deploy-blog
 on:
   push:
     branches: [main]
-    paths:
-      - 'blog-service/**'
+    # paths:
+    #   - 'blog-service/**'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: adome
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx

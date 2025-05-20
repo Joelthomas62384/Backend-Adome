@@ -2,12 +2,13 @@ name: deploy-manifests
 on:
   push:
     branches: [main]
-    paths:
-      - 'k8s/**'
+    # paths:
+    #   - 'k8s/**'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: adome
 
     steps:
       - name: Check out code

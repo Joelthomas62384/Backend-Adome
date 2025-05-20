@@ -2,11 +2,12 @@ name: deploy-community
 on:
   push:
     branches: [main]
-    paths:
-      - 'community-service/**'
+    # paths:
+    #   - 'community-service/**'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: adome
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
