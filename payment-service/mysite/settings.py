@@ -55,32 +55,31 @@ MIDDLEWARE = [
 
 ]
 
-
-
-
 import re
 
+# ✅ Regex-based subdomain matching for CORS
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https?:\/\/localhost(:\d+)?$",                      # localhost HTTP/HTTPS
-    r"^https?:\/\/([a-zA-Z0-9-]+)\.localhost(:\d+)?$",    # subdomains of localhost
-    r"^https:\/\/theadome\.xyz$",                          # https://theadome.xyz exact
-    r"^https:\/\/([a-zA-Z0-9-]+)\.theadome\.xyz$",        # subdomains like https://sub.theadome.xyz
+    r"^https?:\/\/localhost(:\d+)?$",                       # Localhost
+    r"^https?:\/\/([a-zA-Z0-9-]+)\.localhost(:\d+)?$",      # Subdomains of localhost
+    r"^https:\/\/theadome\.xyz$",                           # Exact main domain
+    r"^https:\/\/([a-zA-Z0-9-]+)\.theadome\.xyz$",          # Subdomains of theadome.xyz
 ]
 
+# ✅ CSRF trusted origins for POST and cookie CSRF
 CSRF_TRUSTED_ORIGINS = [
     "https://theadome.xyz",
-    "https://*.theadome.xyz",   # wildcard subdomains for CSRF trusted origins
-    "http://localhost:3000",    # keep localhost if still developing locally
+    "https://*.theadome.xyz",
+    "http://localhost:3000",
 ]
 
 CORS_ALLOW_HEADERS = [
-    "content-type",
-    "authorization",
-    "x-csrftoken",
-    "x-requested-with",
     "accept",
     "accept-encoding",
+    "authorization",
+    "content-type",
     "origin",
+    "x-csrftoken",
+    "x-requested-with",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
