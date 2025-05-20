@@ -19,7 +19,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build and push Docker image
         run: |
-          docker build -t joelthomas1103/adome-webbuilder:latest ./webbuilder
+          docker build -t joelthomas1103/adome-webbuilder:latest .
           docker push joelthomas1103/adome-webbuilder:latest
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
