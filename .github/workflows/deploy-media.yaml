@@ -2,8 +2,8 @@ name: deploy-media
 on:
   push:
     branches: [main]
-    # paths:
-    #   - 'media-service/**'
+    paths:
+      - 'media-service/**'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

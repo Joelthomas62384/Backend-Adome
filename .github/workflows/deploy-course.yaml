@@ -2,8 +2,8 @@ name: deploy-course
 on:
   push:
     branches: [main]
-    # paths:
-    #   - 'course-service/**'
+    paths:
+      - 'course-service/**'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

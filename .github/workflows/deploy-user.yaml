@@ -2,8 +2,8 @@ name: deploy-user
 on:
   push:
     branches: [main]
-    # paths:
-    #   - 'user-service/**'
+    paths:
+      - 'user-service/**'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

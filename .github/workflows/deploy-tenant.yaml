@@ -2,8 +2,8 @@ name: deploy-tenant
 on:
   push:
     branches: [main]
-    # paths:
-    #   - 'tenant-service/**'
+    paths:
+      - 'tenant-service/**'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

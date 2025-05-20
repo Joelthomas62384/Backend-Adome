@@ -2,8 +2,8 @@ name: deploy-webbuilder
 on:
   push:
     branches: [main]
-    # paths:
-    #   - 'website-builder/**'
+    paths:
+      - 'website-builder/**'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

@@ -31,6 +31,11 @@ jobs:
 
       - name: Apply PVC manifests
         run: kubectl apply -f k8s/pvc/
+      
+      - name: Apply PVC manifests
+        run: kubectl apply -f k8s/postgres-init-configmap.yml
+      # - name: Apply ConfigMap manifests
+      #       run: kubectl apply -f k8s/configmap/ 
 
       - name: Apply Secrets manifests
         run: kubectl apply -f k8s/secrets/

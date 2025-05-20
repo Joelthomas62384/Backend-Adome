@@ -2,8 +2,8 @@ name: deploy-comment
 on:
   push:
     branches: [main]
-    # paths:
-    #   - 'comment-service/**'
+    paths:
+      - 'comment-service/**'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

@@ -2,8 +2,8 @@ name: deploy-payment
 on:
   push:
     branches: [main]
-    # paths:
-    #   - 'payment-service/**'
+    paths:
+      - 'payment-service/**'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
