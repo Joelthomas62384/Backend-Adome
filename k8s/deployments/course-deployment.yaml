@@ -7,11 +7,14 @@ spec:
   selector:
     matchLabels:
       app: course
+  strategy:
+    type: Recreate 
   template:
     metadata:
       labels:
         app: course
     spec:
+      terminationGracePeriodSeconds: 30 
       initContainers:
         - name: wait-for-rootdb
           image: busybox:1.36
