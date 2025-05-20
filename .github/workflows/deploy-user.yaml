@@ -17,8 +17,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: create env
+        working-directory: ./user-service
+        run: |
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "FRONT_END=${{ secrets.FRONT_END }}" >> .env
+          
       - name: Build and push Docker image
         working-directory: ./user-service
+        
         run: |
           docker build -t joelthomas1103/adome-user:latest .
           docker push joelthomas1103/adome-user:latest
