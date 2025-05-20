@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: blog
+  name: webbuilder
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: blog
+      app: webbuilder
   template:
     metadata:
       labels:
-        app: blog
+        app: webbuilder
     spec:
       initContainers:
         - name: wait-for-rootdb
@@ -25,10 +25,11 @@ spec:
               until curl -u root:root -s -o /dev/null -w "%{http_code}" rabbitmq:15672/api/overview | grep -q "200"; 
               do echo "Waiting for RabbitMQ to be ready..."; sleep 2; done
 
-        
+
+       
       containers:
-        - name: blog
-          image: joelthomas1103/adome-blog:latest 
+        - name: webbuilder
+          image: joelthomas1103/adome-webbuilder:latest 
           ports:
             - containerPort: 8000  
           env:
@@ -46,22 +47,22 @@ spec:
                   name: secrets
                   key: SECRET_KEY
           volumeMounts:
-            - name: blog-storage
-              mountPath: /app/blog_data/  
+            - name: webbuilder-storage
+              mountPath: /app/webbuilder_data/  
       
       volumes:
-        - name: blog-storage
+        - name: webbuilder-storage
           persistentVolumeClaim:
-            claimName: shared-migrations-pvc 
+            claimName:  webbuilder-pvc 
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: blog-service
+  name: webbuilder-service
 spec:
   selector:
-    app: blog  
+    app: webbuilder  
   ports:
     - protocol: TCP
       port: 8000          

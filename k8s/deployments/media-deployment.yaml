@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: payment
+  name: media
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: payment
+      app: media
   template:
     metadata:
       labels:
-        app: payment
+        app: media
     spec:
       initContainers:
         - name: wait-for-rootdb
@@ -25,9 +25,10 @@ spec:
               until curl -u root:root -s -o /dev/null -w "%{http_code}" rabbitmq:15672/api/overview | grep -q "200"; 
               do echo "Waiting for RabbitMQ to be ready..."; sleep 2; done
 
+      
       containers:
-        - name: payment
-          image: joelthomas1103/adome-payment:latest 
+        - name: media
+          image: joelthomas1103/adome-media:latest 
           ports:
             - containerPort: 8000  
           env:
@@ -37,32 +38,32 @@ spec:
               value: "root"
             - name: DB_USER
               value: "root"
-            - name: DB_PASSWORD
-              value: "root"
+            - name: DB_PASSWORD  # Getting from secret
+              value : "root"
             - name: SECRET_KEY  # Getting from secret
               valueFrom:
                 secretKeyRef:
                   name: secrets
                   key: SECRET_KEY
           volumeMounts:
-            - name: payment-storage
-              mountPath: /app/payment_data/  
+            - name: media-storage
+              mountPath: /app/media_data/  
       
       volumes:
-        - name: payment-storage
+        - name: media-storage
           persistentVolumeClaim:
-            claimName: shared-migrations-pvc 
+            claimName: media-pvc 
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: payment-service
+  name: media-service
 spec:
   selector:
-    app: payment  
+    app: media  
   ports:
     - protocol: TCP
       port: 8000          
       targetPort: 8000    
-  type: ClusterIP
+  type: ClusterIP       

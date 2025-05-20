@@ -1,0 +1,27 @@
+name: deploy-manifests
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'k8s/**'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Configure kubectl
+        uses: google-github-actions/get-gke-credentials@v1
+        with:
+          cluster_name: adome-cluster
+          location: asia-south1-a
+          project_id: adome-ms
+      - name: Apply all manifests
+        run: |
+          kubectl apply -f k8s/pvc/
+          kubectl apply -f k8s/secrets/
+          kubectl apply -f k8s/deployments/
+          kubectl apply -f k8s/ingress/production/

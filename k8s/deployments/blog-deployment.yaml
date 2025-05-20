@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: community
+  name: blog
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: community
+      app: blog
   template:
     metadata:
       labels:
-        app: community
+        app: blog
     spec:
       initContainers:
         - name: wait-for-rootdb
@@ -25,13 +25,10 @@ spec:
               until curl -u root:root -s -o /dev/null -w "%{http_code}" rabbitmq:15672/api/overview | grep -q "200"; 
               do echo "Waiting for RabbitMQ to be ready..."; sleep 2; done
 
-        - name: wait-for-redis
-          image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z redis 6379; do echo "Waiting for Redis..."; sleep 2; done']
-
+        
       containers:
-        - name: community
-          image: joelthomas1103/adome-community:latest 
+        - name: blog
+          image: joelthomas1103/adome-blog:latest 
           ports:
             - containerPort: 8000  
           env:
@@ -49,22 +46,22 @@ spec:
                   name: secrets
                   key: SECRET_KEY
           volumeMounts:
-            - name: community-storage
-              mountPath: /app/community_data/  
-
+            - name: blog-storage
+              mountPath: /app/blog_data/  
+      
       volumes:
-        - name: community-storage
+        - name: blog-storage
           persistentVolumeClaim:
-            claimName: shared-migrations-pvc 
+            claimName: blog-pvc 
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: community-service
+  name: blog-service
 spec:
   selector:
-    app: community  
+    app: blog  
   ports:
     - protocol: TCP
       port: 8000          

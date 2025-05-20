@@ -54,7 +54,7 @@ spec:
       volumes:
         - name: tenant-storage
           persistentVolumeClaim:
-            claimName: shared-migrations-pvc 
+            claimName: tenant-pvc 
 
 ---
 apiVersion: v1

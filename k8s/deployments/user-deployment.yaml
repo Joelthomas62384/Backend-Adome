@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: course
+  name: user
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: course
+      app: user
   template:
     metadata:
       labels:
-        app: course
+        app: user
     spec:
       initContainers:
         - name: wait-for-rootdb
@@ -25,10 +25,9 @@ spec:
               until curl -u root:root -s -o /dev/null -w "%{http_code}" rabbitmq:15672/api/overview | grep -q "200"; 
               do echo "Waiting for RabbitMQ to be ready..."; sleep 2; done
 
-      
       containers:
-        - name: course
-          image: joelthomas1103/adome-course:latest 
+        - name: user
+          image: joelthomas1103/adome-user:latest 
           ports:
             - containerPort: 8000  
           env:
@@ -45,23 +44,30 @@ spec:
                 secretKeyRef:
                   name: secrets
                   key: SECRET_KEY
+            - name: GOOGLE_CLIENT_ID
+              value: "1053845778798-qro8gk1hhvm8m2q7143j9tp4c1rm65dj.apps.googleusercontent.com"
+            - name: GOOGLE_CLIENT_SECRET
+              value: "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"
+            - name : FRONTEND_URL
+              value : "http://localhost:3000"
           volumeMounts:
-            - name: course-storage
-              mountPath: /app/course_data/  
+            - name: user-storage
+              mountPath: /app/user_data/  
+
       
       volumes:
-        - name: course-storage
+        - name: user-storage
           persistentVolumeClaim:
-            claimName: shared-migrations-pvc 
+            claimName: user-pvc 
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: course-service
+  name: user-service
 spec:
   selector:
-    app: course  
+    app: user  
   ports:
     - protocol: TCP
       port: 8000          

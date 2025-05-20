@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user
+  name: payment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user
+      app: payment
   template:
     metadata:
       labels:
-        app: user
+        app: payment
     spec:
       initContainers:
         - name: wait-for-rootdb
@@ -26,8 +26,8 @@ spec:
               do echo "Waiting for RabbitMQ to be ready..."; sleep 2; done
 
       containers:
-        - name: user
-          image: joelthomas1103/adome-user:latest 
+        - name: payment
+          image: joelthomas1103/adome-payment:latest 
           ports:
             - containerPort: 8000  
           env:
@@ -44,32 +44,25 @@ spec:
                 secretKeyRef:
                   name: secrets
                   key: SECRET_KEY
-            - name: GOOGLE_CLIENT_ID
-              value: "1053845778798-qro8gk1hhvm8m2q7143j9tp4c1rm65dj.apps.googleusercontent.com"
-            - name: GOOGLE_CLIENT_SECRET
-              value: "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"
-            - name : FRONTEND_URL
-              value : "http://localhost:3000"
           volumeMounts:
-            - name: user-storage
-              mountPath: /app/user_data/  
-
+            - name: payment-storage
+              mountPath: /app/payment_data/  
       
       volumes:
-        - name: user-storage
+        - name: payment-storage
           persistentVolumeClaim:
-            claimName: shared-migrations-pvc 
+            claimName: payment-pvc 
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-service
+  name: payment-service
 spec:
   selector:
-    app: user  
+    app: payment  
   ports:
     - protocol: TCP
       port: 8000          
       targetPort: 8000    
-  type: ClusterIP       
+  type: ClusterIP

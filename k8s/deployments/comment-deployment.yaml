@@ -52,7 +52,7 @@ spec:
       volumes:
         - name: comment-storage
           persistentVolumeClaim:
-            claimName: shared-migrations-pvc 
+            claimName: comment-pvc 
 
 ---
 apiVersion: v1

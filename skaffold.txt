@@ -4,7 +4,7 @@ metadata:
   name: backend
 build:
   artifacts:
-    - image: joelthomas1103/adome-blog
+    - image: joelthomas1103/blog
       context: blog-service
       docker:
         dockerfile: Dockerfile
@@ -16,7 +16,7 @@ build:
             dest: "/app"
 
 
-    - image: joelthomas1103/adome-comment
+    - image: joelthomas1103/comment
       context: comment-service
       docker:
         dockerfile: Dockerfile
@@ -28,7 +28,7 @@ build:
             dest: "/app"
 
 
-    - image: joelthomas1103/adome-community
+    - image: joelthomas1103/community
       context: community-service
       docker:
         dockerfile: Dockerfile
@@ -40,7 +40,7 @@ build:
             dest: "/app"
 
 
-    - image: joelthomas1103/adome-course
+    - image: joelthomas1103/course
       context: course-service
       docker:
         dockerfile: Dockerfile
@@ -52,7 +52,7 @@ build:
             dest: "/app"
 
 
-    - image: joelthomas1103/adome-media
+    - image: joelthomas1103/media
       context: media-service
       docker:
         dockerfile: Dockerfile
@@ -64,7 +64,7 @@ build:
             dest: "/app"
 
 
-    - image: joelthomas1103/adome-payment
+    - image: joelthomas1103/payment
       context: payment-service
       docker:
         dockerfile: Dockerfile
@@ -76,7 +76,7 @@ build:
             dest: "/app"
 
 
-    - image: joelthomas1103/adome-tenant
+    - image: joelthomas1103/tenant
       context: tenant-service
       docker:
         dockerfile: Dockerfile
@@ -88,7 +88,7 @@ build:
             dest: "/app"
 
 
-    - image: joelthomas1103/adome-user
+    - image: joelthomas1103/user
       context: user-service
       docker:
         dockerfile: Dockerfile
@@ -100,7 +100,7 @@ build:
             dest: "/app"
 
 
-    - image: joelthomas1103/adome-webbuilder
+    - image: joelthomas1103/webbuilder
       context: website-builder
       docker:
         dockerfile: Dockerfile
@@ -114,7 +114,7 @@ build:
 
 manifests:
   rawYaml:
-    # - ingress-websockets.txt
+    - k8s/secrets/secret.yml
     - k8s/postgres-init-configmap.yml
     - k8s/deployments/blog-deplment.yml
     - k8s/deployments/comments-deployment.yml
@@ -129,6 +129,3 @@ manifests:
     - k8s/deployments/user-deployment.yml
     - k8s/deployments/webbuilder-deployment.yml
     - k8s/ingress/development/ingress.yml
-    # - k8s/ingress/production/ingress.yml
-    # - k8s/pvc/shared-pvc.yml
-    - k8s/secrets/secret.yml

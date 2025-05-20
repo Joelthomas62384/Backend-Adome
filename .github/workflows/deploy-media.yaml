@@ -1,0 +1,35 @@
+name: deploy-media
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'media-service/**'
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push Docker image
+        run: |
+          docker build -t joelthomas1103/adome-media:latest ./media
+          docker push joelthomas1103/adome-media:latest
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Configure kubectl
+        uses: google-github-actions/get-gke-credentials@v1
+        with:
+          cluster_name: adome-cluster
+          location: asia-south1-a
+          project_id: adome-ms
+      - name: Restart media deployment to pull new image
+        run: |
+          kubectl rollout restart deployment media-deployment
