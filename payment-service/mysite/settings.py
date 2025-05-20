@@ -25,7 +25,7 @@ SECRET_KEY = os.getenv('SECRET_KEY','asdfasdfasdf')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -58,19 +58,17 @@ MIDDLEWARE = [
 
 
 
-import re
 
+
+import re
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https?:\/\/localhost(:\d+)?$",                      # localhost HTTP/HTTPS
-    r"^https?:\/\/([a-zA-Z0-9-]+)\.localhost(:\d+)?$",    # subdomains of localhost
-    r"^https:\/\/theadome\.xyz$",                          # https://theadome.xyz exact
-    r"^https:\/\/([a-zA-Z0-9-]+)\.theadome\.xyz$",        # subdomains like https://sub.theadome.xyz
+    r"^http?:\/\/localhost(:\d+)?$",
+    r"^http?:\/\/([a-zA-Z0-9-]+)\.localhost(:\d+)?$",
 ]
 
+
 CSRF_TRUSTED_ORIGINS = [
-    "https://theadome.xyz",
-    "https://*.theadome.xyz",   # wildcard subdomains for CSRF trusted origins
-    "http://localhost:3000",    # keep localhost if still developing locally
+    "http://localhost:3000", 
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -82,8 +80,8 @@ CORS_ALLOW_HEADERS = [
     "accept-encoding",
     "origin",
 ]
-
 CORS_ALLOW_CREDENTIALS = True
+
 
 ROOT_URLCONF = 'mysite.urls'
 

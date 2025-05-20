@@ -22,7 +22,7 @@ SECRET_KEY = os.getenv('SECRET_KEY','asdfasdfasdf' )
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = []
 
 
 
@@ -71,32 +71,18 @@ REST_FRAMEWORK = {
 }
 
 
-import re
 
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https?:\/\/localhost(:\d+)?$",                      # localhost HTTP/HTTPS
-    r"^https?:\/\/([a-zA-Z0-9-]+)\.localhost(:\d+)?$",    # subdomains of localhost
-    r"^https:\/\/theadome\.xyz$",                          # https://theadome.xyz exact
-    r"^https:\/\/([a-zA-Z0-9-]+)\.theadome\.xyz$",        # subdomains like https://sub.theadome.xyz
-]
+BASE_DOMAIN = os.getenv("BASE_DOMAIN", "localhost:3000")  
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://theadome.xyz",
-    "https://*.theadome.xyz",   # wildcard subdomains for CSRF trusted origins
-    "http://localhost:3000",    # keep localhost if still developing locally
+    f"https://*.{BASE_DOMAIN}",  
+    "http://localhost:3000",  
 ]
 
-CORS_ALLOW_HEADERS = [
-    "content-type",
-    "authorization",
-    "x-csrftoken",
-    "x-requested-with",
-    "accept",
-    "accept-encoding",
-    "origin",
-]
-
+CORS_ALLOW_ALL_ORIGINS = True 
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+CORS_ALLOW_HEADERS = ["*"]
 
 ROOT_URLCONF = 'mysite.urls'
 

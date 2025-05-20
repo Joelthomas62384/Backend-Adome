@@ -53,12 +53,10 @@ spec:
             - name: GOOGLE_CLIENT_SECRET
               value: "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"
             - name : FRONTEND_URL
-              value : "https://theadome.xyz"
+              value : "http://localhost:3000"
           volumeMounts:
             - name: user-storage
               mountPath: /app/user_data/  
-
-              
 
       
       volumes:
