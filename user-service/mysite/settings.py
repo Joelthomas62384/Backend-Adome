@@ -54,6 +54,11 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https:\/\/([a-zA-Z0-9-]+)\.theadome\.xyz$",          # Subdomains of theadome.xyz
 ]
 
+
+
+
+
+
 # ✅ CSRF trusted origins for POST and cookie CSRF
 CSRF_TRUSTED_ORIGINS = [
     "https://theadome.xyz",
