@@ -17,18 +17,22 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: create env
+      - name: Create env
         working-directory: ./user-service
         run: |
-          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
-          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "DB_HOST=rootdb" >> .env
+          echo "DB_NAME=root" >> .env
+          echo "DB_USER=root" >> .env
+          echo "DB_PASSWORD=root" >> .env
           echo "FRONTEND_URL=${{ secrets.FRONT_END }}" >> .env
-          
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          cat .env  # Debug: Verify env variables
       - name: Build and push Docker image
         working-directory: ./user-service
-        
         run: |
-          docker build -t joelthomas1103/adome-user:latest .
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t joelthomas1103/adome-user:${IMAGE_TAG} -t joelthomas1103/adome-user:latest .
+          docker push joelthomas1103/adome-user:${IMAGE_TAG}
           docker push joelthomas1103/adome-user:latest
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -40,6 +44,8 @@ jobs:
           cluster_name: adome-cluster
           location: asia-south1-a
           project_id: adome-ms
-      - name: Restart user deployment to pull new image
+      - name: Update deployment with new image
         run: |
+          kubectl set image deployment/user user=joelthomas1103/adome-user:${{ github.sha }}
           kubectl rollout restart deployment user
+          kubectl rollout status deployment user
