@@ -89,6 +89,7 @@ class LoginView(APIView):
         }
         
         # # print(google_client_id)
+        print(frontend)
         user_email = request.COOKIES.get('user_email')
         if user_email:
             params["login_hint"] = user_email
