@@ -87,7 +87,7 @@ class LoginView(APIView):
             'access_type':'offline',
             # "prompt":"select_account"
         }
-        # # print(redirect_uri)
+        
         # # print(google_client_id)
         user_email = request.COOKIES.get('user_email')
         if user_email:
