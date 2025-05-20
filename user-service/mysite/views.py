@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 import requests 
 from django.contrib.auth import get_user_model
-from dotenv import dotenv_values
+from dotenv import dotenv_values , load_dotenv
 from django.shortcuts import redirect
 import urllib.parse
 from rest_framework.pagination import PageNumberPagination
@@ -20,8 +20,9 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.db.models.aggregates import Count
 from django.db.models.functions import TruncMonth
+import os
 
-
+load_dotenv()
 
 class LoginDataView(APIView):
     authentication_classes = []
@@ -66,8 +67,10 @@ class LoginView(APIView):
     permission_classes = []
     authentication_classes = []
     def get(self,request):
-        google_client_id = dotenv_values(".env")["GOOGLE_CLIENT_ID"]    
-        frontend = dotenv_values(".env")["FRONTEND_URL"]
+        # google_client_id = dotenv_values(".env")["GOOGLE_CLIENT_ID"]    
+        # frontend = os.environ.get('FRONTEND_URL')
+        google_client_id = os.environ.get('GOOGLE_CLIENT_ID')  
+        frontend = os.environ.get('FRONTEND_URL')
         redirect_uri = f"{frontend}/auth/callback"
         scope = "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
         if hasattr(request , 'tenant'):
@@ -110,7 +113,7 @@ class LoginView(APIView):
             if error:
                 # print("error")
                 return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
-            frontend = dotenv_values(".env")["FRONTEND_URL"]
+            frontend = os.environ.get('FRONTEND_URL')
             redirect_uri = f"{frontend}/auth/callback"
             # print(redirect_uri)
             if error or not state :
@@ -121,8 +124,9 @@ class LoginView(APIView):
 
             token_data = {
                 "code": code,
-                "client_id": env["GOOGLE_CLIENT_ID"],
-                "client_secret": env["GOOGLE_CLIENT_SECRET"],
+                "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
+                # "client_secret": env["GOOGLE_CLIENT_SECRET"],
+                "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
                 "redirect_uri": redirect_uri,
                 "grant_type": "authorization_code"
             }
@@ -291,7 +295,7 @@ class LogoutView(APIView):
         return response
     
 
-    
+
 
     
 
