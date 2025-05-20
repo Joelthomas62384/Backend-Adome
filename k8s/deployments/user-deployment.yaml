@@ -61,7 +61,6 @@ spec:
         - name: user-storage
           persistentVolumeClaim:
             claimName: user-pvc 
-
 ---
 apiVersion: v1
 kind: Service
