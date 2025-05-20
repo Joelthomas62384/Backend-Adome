@@ -71,7 +71,7 @@ class LoginView(APIView):
         # frontend = os.environ.get('FRONTEND_URL')
         google_client_id = os.environ.get('GOOGLE_CLIENT_ID')  
         frontend = os.environ.get('FRONTEND_URL')
-        redirect_uri = f"{frontend}/auth/callback"
+        redirect_uri = f"{frontend}auth/callback"
         scope = "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
         if hasattr(request , 'tenant'):
             state = request.tenant.subdomain
