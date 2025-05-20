@@ -16,9 +16,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.userscope = self.scope['userscope']
         self.community = await self.get_community()
 
-        # if not (self.tenant and self.tenantuser and self.user and self.community) : 
-        #     self.close()
-        #     return
+        if not (self.tenant and self.tenantuser and self.user and self.community) : 
+            self.close()
+            return
 
         await self.channel_layer.group_add(self.room_group_name , self.channel_name)
         tenantuser_str = await sync_to_async(str)(self.tenantuser)
