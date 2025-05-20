@@ -55,16 +55,19 @@ MIDDLEWARE = [
     'app.middlewares.TenantMiddleware',
 ]
 
-
 import re
+
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http?:\/\/localhost(:\d+)?$",
-    r"^http?:\/\/([a-zA-Z0-9-]+)\.localhost(:\d+)?$",
+    r"^https?:\/\/localhost(:\d+)?$",                      # localhost HTTP/HTTPS
+    r"^https?:\/\/([a-zA-Z0-9-]+)\.localhost(:\d+)?$",    # subdomains of localhost
+    r"^https:\/\/theadome\.xyz$",                          # https://theadome.xyz exact
+    r"^https:\/\/([a-zA-Z0-9-]+)\.theadome\.xyz$",        # subdomains like https://sub.theadome.xyz
 ]
 
-
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000", 
+    "https://theadome.xyz",
+    "https://*.theadome.xyz",   # wildcard subdomains for CSRF trusted origins
+    "http://localhost:3000",    # keep localhost if still developing locally
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -76,6 +79,7 @@ CORS_ALLOW_HEADERS = [
     "accept-encoding",
     "origin",
 ]
+
 CORS_ALLOW_CREDENTIALS = True
 
 

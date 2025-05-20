@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv('SECRET_KEY','asdfasdfasdf')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["https://adome.codewithjoe.in" , "adome.codewithjoe.in"]
+ALLOWED_HOSTS = ["*"]
 
 
 
@@ -44,8 +44,7 @@ INSTALLED_APPS = [
      'rest_framework',
      'app',
 ]
-# Allow secure cookies
-import re
+# Alimport re
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https?:\/\/localhost(:\d+)?$",                      # localhost HTTP/HTTPS
@@ -71,7 +70,6 @@ CORS_ALLOW_HEADERS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
