@@ -30,7 +30,7 @@ class TenantView(APIView):
         serializer = TenantSerializer(data=request.data, context={'request': request})
         print(request.data)
         if serializer.is_valid():
-            frontend = f"{request.data.get('subdomain')}.localhost:3000"
+            frontend = f"{request.data.get('subdomain')}.theadome.xyz"
             print(frontend)
             tenant_instance = serializer.save(admin=request.user)
             Domain.objects.create(tenant=tenant_instance , domain=frontend)

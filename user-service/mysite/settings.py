@@ -45,17 +45,32 @@ INSTALLED_APPS = [
      'app',
 ]
 # Allow secure cookies
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+import re
 
-# Allow frontend domain to access backend cookies
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    "https://brototype.localhost.com",  # Change this to match your frontend
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https?:\/\/localhost(:\d+)?$",                      # localhost HTTP/HTTPS
+    r"^https?:\/\/([a-zA-Z0-9-]+)\.localhost(:\d+)?$",    # subdomains of localhost
+    r"^https:\/\/theadome\.xyz$",                          # https://theadome.xyz exact
+    r"^https:\/\/([a-zA-Z0-9-]+)\.theadome\.xyz$",        # subdomains like https://sub.theadome.xyz
 ]
 
-# If using CORS_ALLOW_ALL_ORIGINS (not recommended)
-CORS_ALLOW_ALL_ORIGINS = False
+CSRF_TRUSTED_ORIGINS = [
+    "https://theadome.xyz",
+    "https://*.theadome.xyz",   # wildcard subdomains for CSRF trusted origins
+    "http://localhost:3000",    # keep localhost if still developing locally
+]
+
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+    "x-csrftoken",
+    "x-requested-with",
+    "accept",
+    "accept-encoding",
+    "origin",
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
