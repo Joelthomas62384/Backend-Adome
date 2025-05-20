@@ -18,6 +18,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build and push Docker image
+        working-directory: ./media-service
         run: |
           docker build -t joelthomas1103/adome-media:latest .
           docker push joelthomas1103/adome-media:latest
