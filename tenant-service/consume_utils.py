@@ -74,6 +74,9 @@ def subscription_callback(ch, event_type, data, method):
 
 
 
+
+
+
     except Exception as e:
         logger.error(f"Processing error: {e}", exc_info=True)
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True) 
