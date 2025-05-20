@@ -22,7 +22,7 @@ jobs:
         run: |
           echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
           echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
-          echo "FRONT_END=${{ secrets.FRONTEND_URL }}" >> .env
+          echo "FRONTEND_URL=${{ secrets.FRONT_END }}" >> .env
           
       - name: Build and push Docker image
         working-directory: ./user-service

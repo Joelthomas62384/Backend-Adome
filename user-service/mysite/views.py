@@ -290,6 +290,7 @@ class LogoutView(APIView):
         response.delete_cookie('expiry', domain=None)
         return response
     
+
     
 
     
