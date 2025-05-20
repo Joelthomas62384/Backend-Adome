@@ -46,20 +46,15 @@ INSTALLED_APPS = [
 ]
 import re
 
-# ✅ Regex-based subdomain matching for CORS
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https?:\/\/localhost(:\d+)?$",                       # Localhost
-    r"^https?:\/\/([a-zA-Z0-9-]+)\.localhost(:\d+)?$",      # Subdomains of localhost
-    r"^https:\/\/theadome\.xyz$",                           # Exact main domain
-    r"^https:\/\/([a-zA-Z0-9-]+)\.theadome\.xyz$",          # Subdomains of theadome.xyz
+    r"^https?:\/\/localhost(:\d+)?$",                     
+    r"^https?:\/\/([a-zA-Z0-9-]+)\.localhost(:\d+)?$",     
+    r"^https:\/\/theadome\.xyz$",                           
+    r"^https:\/\/([a-zA-Z0-9-]+)\.theadome\.xyz$",          
 ]
 
 
 
-
-
-
-# ✅ CSRF trusted origins for POST and cookie CSRF
 CSRF_TRUSTED_ORIGINS = [
     "https://theadome.xyz",
     "https://*.theadome.xyz",
