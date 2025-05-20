@@ -34,6 +34,7 @@ spec:
       containers:
         - name: tenant
           image: joelthomas1103/adome-tenant:latest 
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000  
           env:

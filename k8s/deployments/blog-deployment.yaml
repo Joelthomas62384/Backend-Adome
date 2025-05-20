@@ -31,6 +31,7 @@ spec:
       containers:
         - name: blog
           image: joelthomas1103/adome-blog:latest 
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000  
           env:

@@ -33,6 +33,7 @@ spec:
       containers:
         - name: webbuilder
           image: joelthomas1103/adome-webbuilder:latest 
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000  
           env:

@@ -15,7 +15,7 @@ spec:
         app: community
     
     spec:
-    
+
       terminationGracePeriodSeconds: 30 
       initContainers:
         - name: wait-for-rootdb
@@ -36,7 +36,8 @@ spec:
 
       containers:
         - name: community
-          image: joelthomas1103/adome-community:latest 
+          image: joelthomas1103/adome-community:latest
+          imagePullPolicy: Always 
           ports:
             - containerPort: 8000  
           env:
