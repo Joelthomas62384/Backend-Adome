@@ -22,6 +22,8 @@ spec:
               value: "root"
             - name: POSTGRES_DB
               value: "root"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/db"  # 👈 tell Postgres to use subdir
           ports:
             - containerPort: 5432
           volumeMounts:
@@ -36,6 +38,7 @@ spec:
         - name: rootdb-storage
           persistentVolumeClaim:
             claimName: rootdb-pvc
+
 
 ---
 
