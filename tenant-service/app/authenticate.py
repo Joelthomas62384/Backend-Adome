@@ -10,8 +10,9 @@ class CustomJwtAuthentication(JWTAuthentication):
         super().__init__(*args, **kwargs)
         self.user_model = UserCache
     def authenticate(self, request):
-        raw_token = request.COOKIES.get('access_token')
-        refresh_token = request.COOKIES.get('refresh_token')
+        subdomain = request.tenant.subdomain
+        raw_token = request.COOKIES.get(f'{subdomain}_access_token')
+        refresh_token = request.COOKIES.get(f'{subdomain}_refresh_token')
 
         if not raw_token or not refresh_token:
             return None  

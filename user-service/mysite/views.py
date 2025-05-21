@@ -20,6 +20,8 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.db.models.aggregates import Count
 from django.db.models.functions import TruncMonth
+from django.utils import timezone
+import datetime
 import os
 
 load_dotenv()
@@ -46,10 +48,16 @@ class LoginDataView(APIView):
             access_token = tokens['access']
 
             expiration_timestamp = access_token['exp']
+            refresh_exp_unix = refresh['exp']
+            access_exp_unix = access_token['exp']
+
+            refresh_expiry = timezone.make_aware(datetime.datetime.fromtimestamp(refresh_exp_unix))
+            access_expiry = timezone.make_aware(datetime.datetime.fromtimestamp(access_exp_unix))
+
 
             response = Response( status=status.HTTP_200_OK)
-            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True)
-            response.set_cookie(key='access_token',  value = str(access_token), secure=True , httponly=True , samesite= "None")
+            response.set_cookie(f'{request.tenant.subdomain}_refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True , expires=refresh_expiry)
+            response.set_cookie(key=f'{request.tenant.subdomain}_access_token',  value = str(access_token), secure=True ,expires=access_expiry, httponly=True , samesite= "None")
             response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
             return response
         # print(serializer.errors)
@@ -112,13 +120,13 @@ class LoginView(APIView):
                 return Response({"app" : request.tenant.subdomain})
             # # print(code , state)
             if error:
-                # print("error")
+                print("error")
                 return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
             frontend = os.environ.get('FRONTEND_URL')
             redirect_uri = f"{frontend}/auth/callback"
             # print(redirect_uri)
             if error or not state :
-                # print("error or not state")
+                print("error or not state")
                 return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
             token_url = "https://oauth2.googleapis.com/token"
             env = dotenv_values(".env")
@@ -137,7 +145,7 @@ class LoginView(APIView):
                 return Response({'error': 'Authentication failed!'}, status=status.HTTP_400_BAD_REQUEST)
             token_response = requests.post(token_url,data=token_data)
             token_json = token_response.json()
-            access_token = token_json.get('access_token')
+            access_token = token_json.get(f'access_token')
            
 
         
@@ -147,9 +155,10 @@ class LoginView(APIView):
             user_info_params ={"access_token":access_token}
             user_info_response = requests.get(user_info_url,params=user_info_params)
             user_info = user_info_response.json()
-            # print(user_info)
+            print(user_info)
             if user_info.get('error'):
-                return Response({'error': 'Error'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                return Response({'error': str(user_info.get('error'))}, status=status.HTTP_400_BAD_REQUEST)
 
 
             email = str(user_info.get('email'))
@@ -202,20 +211,26 @@ class LoginView(APIView):
             refresh = tokens['refresh']
             access_token = tokens['access']
             expiration_timestamp = access_token['exp']
+            refresh_exp_unix = refresh['exp']
+            access_exp_unix = access_token['exp']
+
+            refresh_expiry = timezone.make_aware(datetime.datetime.fromtimestamp(refresh_exp_unix))
+            access_expiry = timezone.make_aware(datetime.datetime.fromtimestamp(access_exp_unix))
+
             
 
             response = Response({'app':app.subdomain if app else "public" ,'refresh' : str(refresh) , 'access' :str(access_token) , 'expiry' : expiration_timestamp}, status=status.HTTP_200_OK)
-            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True)
-            response.set_cookie(key='access_token',  value = str(access_token), secure=True , httponly=True , samesite= "None")
+            response.set_cookie(f'{request.tenant.subdomain}_refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True  , expires=refresh_expiry)
+            response.set_cookie(key=f'{request.tenant.subdomain}_access_token', expires=access_expiry, value = str(access_token), secure=True , httponly=True , samesite= "None")
             response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
             response.set_cookie(key='user_email', value=user.email, secure=True, httponly=True, samesite="None")
             # print("cookies are set")
             return response
         except requests.exceptions.RequestException as e:
-            # print(e)
+            print(e)
             return Response({'error': f'External request error: {str(e)}'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            # print(e)
+            print(e)
             return Response({'error': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RefreshTokenView(APIView):
@@ -223,8 +238,8 @@ class RefreshTokenView(APIView):
     permission_classes = []
 
     def post(self, request):
-        token = request.COOKIES.get('refresh_token')
-        old_access_token = request.COOKIES.get('access_token')
+        token = request.COOKIES.get(f'{request.tenant.subdomain}_refresh_token')
+        old_access_token = request.COOKIES.get(f'{request.tenant.subdomain}_access_token')
         # print(token , old_access_token)
 
         if not token or not old_access_token:
@@ -246,6 +261,13 @@ class RefreshTokenView(APIView):
             access_token = tokens['access']
             access_token = refresh.access_token
             expiration_timestamp = access_token['exp']
+            refresh_exp_unix = refresh['exp']
+            access_exp_unix = access_token['exp']
+
+            refresh_expiry = timezone.make_aware(datetime.datetime.fromtimestamp(refresh_exp_unix))
+            access_expiry = timezone.make_aware(datetime.datetime.fromtimestamp(access_exp_unix))
+
+            
 
             response = Response({
                 'refresh': str(refresh),
@@ -253,8 +275,8 @@ class RefreshTokenView(APIView):
                 'expiry': expiration_timestamp
             }, status=status.HTTP_200_OK)
 
-            response.set_cookie(key='refresh_token', value=str(refresh), secure=True, httponly=True, samesite="None")
-            response.set_cookie(key='access_token', value=str(access_token), secure=True, httponly=True, samesite="None")
+            response.set_cookie(key=f'{request.tenant.subdomain}_refresh_token',expires=refresh_expiry, value=str(refresh), secure=True, httponly=True, samesite="None")
+            response.set_cookie(key=f'{request.tenant.subdomain}_access_token', expires=access_expiry,value=str(access_token), secure=True, httponly=True, samesite="None")
             response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
 
             return response
@@ -262,8 +284,8 @@ class RefreshTokenView(APIView):
         except Exception as e:
             # print(e)
             response = Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-            response.delete_cookie('refresh_token')
-            response.delete_cookie('access_token')
+            response.delete_cookie(f'{request.tenant.subdomain}_refresh_token')
+            response.delete_cookie(f'{request.tenant.subdomain}_access_token')
             response.delete_cookie('expiry')
             return response
 
@@ -290,8 +312,8 @@ class LogoutView(APIView):
     permission_classes = []
     def post(self, request):
         response = Response(status=status.HTTP_200_OK)
-        response.delete_cookie('refresh_token', domain=None)
-        response.delete_cookie('access_token', domain=None)
+        response.delete_cookie(f'{request.tenant.subdomain}_refresh_token', domain=None)
+        response.delete_cookie(f'{request.tenant.subdomain}_access_token', domain=None)
         response.delete_cookie('expiry', domain=None)
         return response
     
