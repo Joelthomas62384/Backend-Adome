@@ -34,6 +34,7 @@ class LoginDataView(APIView):
         if serializer.is_valid():
 
             # print(serializer.data)
+            host = request.get_host().split(':')[0]
             data = serializer.validated_data
             username = data.get('username')
             password = data.get('password')
@@ -48,9 +49,9 @@ class LoginDataView(APIView):
             expiration_timestamp = access_token['exp']
 
             response = Response( status=status.HTTP_200_OK)
-            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True)
-            response.set_cookie(key='access_token',  value = str(access_token), secure=True , httponly=True , samesite= "None")
-            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
+            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True,domain=host)
+            response.set_cookie(key='access_token',  value = str(access_token), secure=True , httponly=True , samesite= "None",domain=host)
+            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None",domain=host)
             return response
         # print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -198,17 +199,18 @@ class LoginView(APIView):
 
 
             # # print(app)
+            host = request.get_host().split(':')[0]
             tokens = create_user_scope(user , request)
             refresh = tokens['refresh']
             access_token = tokens['access']
             expiration_timestamp = access_token['exp']
             
 
-            response = Response({'app':app.subdomain if app else "public" ,'refresh' : str(refresh) , 'access' :str(access_token) , 'expiry' : expiration_timestamp}, status=status.HTTP_200_OK)
-            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True)
-            response.set_cookie(key='access_token',  value = str(access_token), secure=True , httponly=True , samesite= "None")
-            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
-            response.set_cookie(key='user_email', value=user.email, secure=True, httponly=True, samesite="None")
+            response = Response({'app':app.subdomain if app else "public" , 'expiry' : expiration_timestamp}, status=status.HTTP_200_OK)
+            response.set_cookie('refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True,domain=host)
+            response.set_cookie(key='access_token',  value = str(access_token), secure=True , httponly=True , samesite= "None",domain=host)
+            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None",domain=host)
+            response.set_cookie(key='user_email', value=user.email, secure=True, httponly=True, samesite="None",domain=host)
             # print("cookies are set")
             return response
         except requests.exceptions.RequestException as e:
@@ -246,16 +248,14 @@ class RefreshTokenView(APIView):
             access_token = tokens['access']
             access_token = refresh.access_token
             expiration_timestamp = access_token['exp']
-
+            host = request.get_host().split(':')[0]
             response = Response({
-                'refresh': str(refresh),
-                'access': str(access_token),
                 'expiry': expiration_timestamp
             }, status=status.HTTP_200_OK)
 
-            response.set_cookie(key='refresh_token', value=str(refresh), secure=True, httponly=True, samesite="None")
-            response.set_cookie(key='access_token', value=str(access_token), secure=True, httponly=True, samesite="None")
-            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
+            response.set_cookie(key='refresh_token', value=str(refresh), secure=True, httponly=True, samesite="None",domain=host)
+            response.set_cookie(key='access_token', value=str(access_token), secure=True, httponly=True, samesite="None",domain=host)
+            response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None",domain=host)
 
             return response
 
