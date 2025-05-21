@@ -58,7 +58,7 @@ class LoginDataView(APIView):
 
             response = Response( status=status.HTTP_200_OK)
             response.set_cookie(f'{request.tenant.subdomain}_refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True , expires=refresh_expiry)
-            response.set_cookie(key=f'{request.tenant.subdomain}_access_token',  value = str(access_token), secure=True ,expires=access_expiry, httponly=True , samesite= "None")
+            response.set_cookie(key=f'{request.tenant.subdomain}_access_token',  value = str(access_token), secure=True ,expires=refresh_expiry, httponly=True , samesite= "None")
             response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
             return response
         # print(serializer.errors)
@@ -223,7 +223,7 @@ class LoginView(APIView):
 
             response = Response({'app':app.subdomain if app else "public" ,'refresh' : str(refresh) , 'access' :str(access_token) , 'expiry' : expiration_timestamp}, status=status.HTTP_200_OK)
             response.set_cookie(f'{request.tenant.subdomain}_refresh_token', str(refresh) , httponly=True , samesite="None" , secure=True  , expires=refresh_expiry)
-            response.set_cookie(key=f'{request.tenant.subdomain}_access_token', expires=access_expiry, value = str(access_token), secure=True , httponly=True , samesite= "None")
+            response.set_cookie(key=f'{request.tenant.subdomain}_access_token', expires=refresh_expiry, value = str(access_token), secure=True , httponly=True , samesite= "None")
             response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
             response.set_cookie(key='user_email', value=user.email, secure=True, httponly=True, samesite="None")
             # print("cookies are set")
@@ -276,7 +276,7 @@ class RefreshTokenView(APIView):
             }, status=status.HTTP_200_OK)
 
             response.set_cookie(key=f'{request.tenant.subdomain}_refresh_token',expires=refresh_expiry, value=str(refresh), secure=True, httponly=True, samesite="None")
-            response.set_cookie(key=f'{request.tenant.subdomain}_access_token', expires=access_expiry,value=str(access_token), secure=True, httponly=True, samesite="None")
+            response.set_cookie(key=f'{request.tenant.subdomain}_access_token', expires=refresh_expiry,value=str(access_token), secure=True, httponly=True, samesite="None")
             response.set_cookie(key='expiry', value=expiration_timestamp, secure=True, httponly=False, samesite="None")
 
             return response

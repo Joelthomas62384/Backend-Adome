@@ -24,9 +24,9 @@ import os
 SECRET_KEY = os.getenv('SECRET_KEY','asdfasdfasdf')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["adome.codewithjoe.in","https://adome.codewithjoe.in"]
 
 
 
