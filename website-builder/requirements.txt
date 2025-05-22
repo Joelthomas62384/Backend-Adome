@@ -9,3 +9,4 @@ django-tenants
 python-dotenv
 requests
 gunicorn
+django-redis

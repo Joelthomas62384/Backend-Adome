@@ -245,6 +245,7 @@ class RefreshTokenView(APIView):
         # print(token , old_access_token)
 
         if not token or not old_access_token:
+            print(token , old_access_token)
             return Response({'error': 'Tokens missing'}, status=status.HTTP_401_UNAUTHORIZED)
 
         try:
