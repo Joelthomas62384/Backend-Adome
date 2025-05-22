@@ -15,6 +15,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.user = self.scope['user']
         self.userscope = self.scope['userscope']
         self.community = await self.get_community()
+        # print(self.scope.path)
 
         # if not (self.tenant and self.tenantuser and self.user and self.community) : 
         #     self.close()
