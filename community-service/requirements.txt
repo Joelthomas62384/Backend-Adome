@@ -9,3 +9,5 @@ python-dotenv
 requests
 channels[daphne]
 channels_redis
+requests
+beautifulsoup4

@@ -291,7 +291,7 @@ class RefreshTokenView(APIView):
             return response
 
     
-from app.authenticate import CustomJwtAuthentication
+# from app.authenticate import CustomJwtAuthentication
 
 class GetUserView(APIView):
     # authentication_classes = [CustomJwtAuthentication]

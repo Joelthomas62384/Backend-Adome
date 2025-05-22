@@ -84,6 +84,8 @@ class CommunityChats(models.Model):
     user = models.ForeignKey(TenantUsers , on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    # is_deleted = models.BooleanField()
+    link = models.JSONField(null=True , blank=True)
 
     def __str__(self):
         return self.community.name
