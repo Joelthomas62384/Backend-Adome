@@ -16,36 +16,40 @@ class AuthenticationMiddleware:
         scope['tenant'] = None
         scope['tenantuser'] = None
         scope['userscope'] = None
+        path = scope.get("path", "")
+        parts = path.strip("/").split("/")
+        if len(parts) >= 4 and parts[0] == "community":
+            tenant_path = parts[1]
+            
+            cookies = scope.get("cookies", {})
+            access_token = cookies.get(f"{tenant_path}_access_token")
 
-        cookies = scope.get("cookies", {})
-        access_token = cookies.get("access_token")
+            if access_token:
+                try:
+                    token = AccessToken(access_token)
+                    tenant = token['tenant']
+                    user_id = token['user_id']
+                    userscope = token['scope']
 
-        if access_token:
-            try:
-                token = AccessToken(access_token)
-                tenant = token['tenant']
-                user_id = token['user_id']
-                userscope = token['scope']
+                    tenant_obj = await self.get_tenant(tenant)
+                    
+                    user = await self.get_user(user_id)
+                    
+                    if user is None or not user.is_active:  
+                        scope['user'] = AnonymousUser()
+                        return await self.app(scope, receive, send)
 
-                tenant_obj = await self.get_tenant(tenant)
-                
-                user = await self.get_user(user_id)
-                
-                if user is None or not user.is_active:  
+                    tenantuser = await self.get_tenantuser(user, tenant_obj)
+
+                    scope['tenant'] = tenant_obj
+                    scope['user'] = user
+                    scope['tenantuser'] = tenantuser
+                    scope['userscope'] = userscope
+
+                except (InvalidToken, TokenError, Tenants.DoesNotExist, UserCache.DoesNotExist, TenantUsers.DoesNotExist) as e:
                     scope['user'] = AnonymousUser()
-                    return await self.app(scope, receive, send)
-
-                tenantuser = await self.get_tenantuser(user, tenant_obj)
-
-                scope['tenant'] = tenant_obj
-                scope['user'] = user
-                scope['tenantuser'] = tenantuser
-                scope['userscope'] = userscope
-
-            except (InvalidToken, TokenError, Tenants.DoesNotExist, UserCache.DoesNotExist, TenantUsers.DoesNotExist) as e:
-                scope['user'] = AnonymousUser()
-                scope['tenant'] = None
-                scope['tenantuser'] = None
+                    scope['tenant'] = None
+                    scope['tenantuser'] = None
 
         return await self.app(scope, receive, send)
 
