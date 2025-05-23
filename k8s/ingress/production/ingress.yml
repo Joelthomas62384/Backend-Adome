@@ -18,10 +18,10 @@ spec:
   
   tls:
     - hosts:
-        - adome.codewithjoe.in
-      secretName: adome-codewithjoe-in-tls
+        - adome.theadome.xyz
+      secretName: adome-theadome-tls
   rules:
-    - host: adome.codewithjoe.in
+    - host: adome.theadome.xyz
       http:
         paths:
           - path: /tenant(/|$)(.*)
