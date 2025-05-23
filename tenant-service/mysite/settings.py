@@ -84,21 +84,22 @@ CORS_ALLOW_HEADERS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-REST_FRAMEWORK = {
-    'DEFAULT_THROTTLE_CLASSES': [
+# REST_FRAMEWORK = {
+   
+# }
+
+
+
+
+REST_FRAMEWORK  = {
+     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.UserRateThrottle',  
         'rest_framework.throttling.AnonRateThrottle',  
     ],
     'DEFAULT_THROTTLE_RATES': {
         'user': '20/min',  
         'anon': '10/min', 
-    }
-}
-
-
-
-
-REST_FRAMEWORK  = {
+    },
     'DEFAULT_AUTHENTICATION_CLASSES': (
        'app.authenticate.CustomJwtAuthentication',
     ),
