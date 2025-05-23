@@ -67,7 +67,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def save_message(self , message) :
+        print(message)
         serializer = CommunityChatSerializer(data =message)
         if serializer.is_valid():
             serializer.save(tenant = self.tenant , user=self.tenantuser, community = self.community)
             return serializer.data
+        else:
+            print(serializer.errors)
+            return None

@@ -86,6 +86,7 @@ class CommunityChats(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     # is_deleted = models.BooleanField()
     link = models.JSONField(null=True , blank=True)
+    optimistic_uuid = models.CharField(max_length=45 , null=True, blank=True)
 
     def __str__(self):
         return self.community.name
