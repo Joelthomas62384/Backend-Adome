@@ -14,6 +14,7 @@ class CommunitySerializer(serializers.ModelSerializer):
 class CommunityChatSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     profile_pic = serializers.SerializerMethodField()
+    
 
     class Meta:
         model = CommunityChats
