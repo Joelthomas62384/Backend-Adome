@@ -244,7 +244,7 @@ class RefreshTokenView(APIView):
         old_access_token = request.COOKIES.get(f'{request.tenant.subdomain}_access_token')
         # print(token , old_access_token)
 
-        if not (token and old_access_token):
+        if not (token):
             print(token , old_access_token)
             return Response({'error': 'Tokens missing'}, status=status.HTTP_401_UNAUTHORIZED)
 
